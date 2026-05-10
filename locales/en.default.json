@@ -56,6 +56,7 @@
       "in_stock": "In stock",
       "low_stock_n": "Only [[count]] left",
       "view_full": "View full details",
+      "live_model_hint": "The piece on the pedestal updates live as you choose options. Close this panel to walk around it.",
       "error_generic": "We couldn\u2019t add that to the cart. Please try again."
     },
     "cart": {

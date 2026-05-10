@@ -79,7 +79,15 @@
 "inventory_management":{{ v.inventory_management | json }},
 "inventory_policy":{{ v.inventory_policy | json }},
 "inventory_quantity":{{ v.inventory_quantity | json }},
-"featured_image":{%- if v.featured_image -%}{{ v.featured_image.src | image_url: width: 1200 | json }}{%- else -%}null{%- endif -%}
+"featured_image":{%- if v.featured_image -%}{{ v.featured_image.src | image_url: width: 1200 | json }}{%- else -%}null{%- endif -%},
+"model_sources":[
+{%- if v.featured_media != blank and v.featured_media.media_type == 'model' -%}
+{%- for s in v.featured_media.sources -%}
+{%- unless forloop.first %},{% endunless -%}
+{"url":{{ s.url | json }},"format":{{ s.format | json }},"mime_type":{{ s.mime_type | json }}}
+{%- endfor -%}
+{%- endif -%}
+]
 }
 {%- endfor -%}
 ],
@@ -232,10 +240,7 @@
     <div class="boutique__product-backdrop" data-boutique-product-close></div>
     <div class="boutique__product-panel">
       <button type="button" class="boutique__product-close" data-boutique-product-close aria-label="{{ 'boutique.product.close' | t }}">&#x2715;</button>
-      <div class="boutique__product-gallery">
-        <div class="boutique__product-media" data-boutique-product-media></div>
-        <div class="boutique__product-thumbs" data-boutique-product-thumbs></div>
-      </div>
+      <p class="boutique__product-live-hint" data-boutique-live-hint>{{ 'boutique.product.live_model_hint' | t }}</p>
       <div class="boutique__product-info">
         <p class="boutique__product-vendor" data-boutique-product-vendor></p>
         <h2 class="boutique__product-title" id="BoutiqueProductTitle" data-boutique-product-title></h2>
@@ -688,24 +693,33 @@
   .boutique__product-panel {
     position: relative;
     z-index: 1;
-    width: min(900px, 100%);
-    max-height: min(720px, 92vh);
-    display: grid;
-    grid-template-columns: 1.05fr 1fr;
-    gap: 0;
-    background: #0e0e14;
+    width: min(440px, 100%);
+    max-height: min(85vh, 640px);
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(165deg, rgba(22, 22, 30, 0.97) 0%, rgba(12, 12, 18, 0.99) 100%);
     color: var(--boutique-fg, #f5f5f5);
-    border: 1px solid color-mix(in srgb, var(--boutique-accent, #f5f5f5) 18%, transparent);
-    border-radius: 1rem;
+    border: 1px solid color-mix(in srgb, var(--boutique-accent, #f5f5f5) 22%, transparent);
+    border-radius: 1.1rem;
     overflow: hidden;
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+    box-shadow:
+      0 24px 64px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.04) inset;
   }
 
-  @media (max-width: 720px) {
-    .boutique__product-panel {
-      grid-template-columns: 1fr;
-      max-height: 95vh;
-    }
+  .boutique__product-live-hint {
+    margin: 0;
+    padding: 0.85rem 3rem 0.65rem 1.1rem;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    letter-spacing: 0.02em;
+    color: color-mix(in srgb, var(--boutique-accent, #f5f5f5) 72%, transparent);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--boutique-accent, #f5f5f5) 8%, transparent), transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .boutique__product-live-hint.is-swapping {
+    opacity: 0.65;
   }
 
   .boutique__product-close {
@@ -722,62 +736,12 @@
     z-index: 2;
   }
 
-  .boutique__product-gallery {
-    background: #0a0a0e;
-    display: flex;
-    flex-direction: column;
-    min-height: 280px;
-  }
-
-  .boutique__product-media {
-    flex: 1;
-    min-height: 280px;
-    display: grid;
-    place-items: center;
-    overflow: hidden;
-  }
-
-  .boutique__product-media img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-  }
-
-  .boutique__product-thumbs {
-    display: flex;
-    gap: 0.4rem;
-    padding: 0.5rem 0.75rem 0.75rem;
-    overflow-x: auto;
-  }
-
-  .boutique__product-thumbs button {
-    flex: 0 0 56px;
-    width: 56px;
-    height: 56px;
-    background: #181820;
-    border: 1px solid transparent;
-    border-radius: 0.5rem;
-    overflow: hidden;
-    padding: 0;
-    cursor: pointer;
-  }
-
-  .boutique__product-thumbs button.is-active {
-    border-color: var(--boutique-accent, #f5f5f5);
-  }
-
-  .boutique__product-thumbs img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
   .boutique__product-info {
-    padding: clamp(1rem, 2.5vw, 1.75rem);
+    padding: clamp(1rem, 3vw, 1.35rem) clamp(1rem, 3vw, 1.35rem) 1.25rem;
     overflow: auto;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.85rem;
   }
 
   .boutique__product-vendor {
@@ -834,41 +798,78 @@
   .boutique__product-options {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 1rem;
   }
 
-  .boutique__product-option-name {
-    font-size: 0.8rem;
+  .boutique__product-option-fieldset {
+    margin: 0;
+    padding: 0;
+    border: none;
+    min-width: 0;
+  }
+
+  .boutique__product-option-legend {
+    padding: 0;
+    margin: 0 0 0.5rem;
+    font-size: 0.68rem;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
-    opacity: 0.7;
+    letter-spacing: 0.2em;
+    color: color-mix(in srgb, var(--boutique-accent, #f5f5f5) 55%, transparent);
   }
 
   .boutique__product-option-values {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
+    gap: 0.35rem;
+    padding: 0.2rem;
+    border-radius: 0.75rem;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
   }
 
   .boutique__product-option-values button {
-    padding: 0.5rem 0.85rem;
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+    flex: 1 1 auto;
+    min-width: fit-content;
+    padding: 0.55rem 1rem;
+    border-radius: 0.55rem;
+    border: 1px solid transparent;
     background: transparent;
     color: inherit;
     font: inherit;
+    font-size: 0.88rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
     cursor: pointer;
-    transition: background 120ms ease, border-color 120ms ease;
+    transition:
+      background 160ms ease,
+      border-color 160ms ease,
+      color 160ms ease,
+      box-shadow 160ms ease,
+      transform 100ms ease;
+  }
+
+  .boutique__product-option-values button:hover:not(.is-unavailable) {
+    background: color-mix(in srgb, var(--boutique-accent, #f5f5f5) 8%, transparent);
+  }
+
+  .boutique__product-option-values button:focus-visible {
+    outline: 2px solid var(--boutique-accent, #f5f5f5);
+    outline-offset: 2px;
   }
 
   .boutique__product-option-values button.is-selected {
-    background: var(--boutique-accent, #f5f5f5);
-    border-color: var(--boutique-accent, #f5f5f5);
-    color: #0b0b0f;
+    background: color-mix(in srgb, var(--boutique-accent, #f5f5f5) 16%, transparent);
+    border-color: color-mix(in srgb, var(--boutique-accent, #f5f5f5) 45%, transparent);
+    color: var(--boutique-accent, #f5f5f5);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--boutique-accent, #f5f5f5) 25%, transparent) inset,
+      0 4px 20px rgba(0, 0, 0, 0.25);
   }
 
   .boutique__product-option-values button.is-unavailable {
-    opacity: 0.4;
+    opacity: 0.34;
+    cursor: not-allowed;
     text-decoration: line-through;
   }
 
@@ -1450,6 +1451,8 @@
     const pedestals = [];
     const spinningGroups = [];
 
+    window.__boutiquePedestals = {};
+
     const radius = Math.max(4, Math.min(15, Number(config.roomRadius) || 9));
     const ringRadius = radius - 2.2;
     const count = products.length;
@@ -1465,6 +1468,7 @@
       pedestal.userData.product = p;
       interactives.push(pedestal, display.pickHelper);
       hydrateDisplay(p, config, gltfLoader, display, spinningGroups);
+      window.__boutiquePedestals[p.id] = { display, config, gltfLoader, spinningGroups };
     }
 
     addFloorMarkings(scene, ringRadius, config);
@@ -1828,6 +1832,10 @@
     group.position.set(x, 0, z);
     group.rotation.y = angle;
 
+    const contentSlot = new THREE.Group();
+    contentSlot.name = 'boutiqueContent';
+    group.add(contentSlot);
+
     const placeholder = new THREE.Mesh(
       new THREE.IcosahedronGeometry(0.35, 0),
       new THREE.MeshStandardMaterial({
@@ -1838,7 +1846,7 @@
       })
     );
     placeholder.position.y = 1.35;
-    group.add(placeholder);
+    contentSlot.add(placeholder);
 
     const label = makeLabelSprite(product.title || '', config);
     label.position.set(0, 2.2, 0);
@@ -1853,10 +1861,45 @@
     pickHelper.userData.product = product;
 
     scene.add(group);
-    return { group, placeholder, label, pickHelper };
+    return {
+      group,
+      contentSlot,
+      placeholder,
+      label,
+      pickHelper,
+      spinningRef: null,
+      displayedVariantId: null,
+      contentEpoch: 0,
+    };
+  }
+
+  function clearDisplayContent(display, spinningGroups) {
+    const slot = display.contentSlot;
+    if (!slot) return;
+    if (display.spinningRef && Array.isArray(spinningGroups)) {
+      const idx = spinningGroups.indexOf(display.spinningRef);
+      if (idx >= 0) spinningGroups.splice(idx, 1);
+    }
+    display.spinningRef = null;
+    while (slot.children.length) {
+      const ch = slot.children[0];
+      slot.remove(ch);
+      disposeDeep(ch);
+    }
+    display.placeholder = null;
+  }
+
+  function resolveModelSourcesForVariant(product, variant) {
+    if (variant && variant.model_sources && variant.model_sources.length > 0) {
+      return variant.model_sources;
+    }
+    const modelMedia = (product.media || []).find((m) => m.media_type === 'model' && m.sources && m.sources.length > 0);
+    return modelMedia && modelMedia.sources ? modelMedia.sources : [];
   }
 
   function hydrateDisplay(product, config, gltfLoader, display, spinningGroups) {
+    display.contentEpoch = (display.contentEpoch || 0) + 1;
+    const epoch = display.contentEpoch;
     const modelMedia = (product.media || []).find((m) => m.media_type === 'model' && m.sources && m.sources.length > 0);
     if (modelMedia) {
       const src = pickGlb(modelMedia.sources);
@@ -1864,31 +1907,29 @@
         gltfLoader.load(
           src.url,
           (gltf) => {
+            if (display.contentEpoch !== epoch) return;
             replacePlaceholderWithModel(display, gltf.scene, config, spinningGroups);
           },
           undefined,
           (err) => {
             console.warn('[boutique] failed to load model for', product.handle, err);
-            replacePlaceholderWithImage(display, product, config, spinningGroups);
+            if (display.contentEpoch !== epoch) return;
+            replacePlaceholderWithImage(display, product, config, spinningGroups, null, null, epoch);
           }
         );
         return;
       }
     }
-    replacePlaceholderWithImage(display, product, config, spinningGroups);
+    replacePlaceholderWithImage(display, product, config, spinningGroups, null, null, epoch);
   }
 
   function pickGlb(sources) {
+    if (!sources || !sources.length) return null;
     return sources.find((s) => /glb/i.test(s.format || s.mime_type || s.url || '')) || sources[0];
   }
 
   function replacePlaceholderWithModel(display, modelScene, config, spinningGroups) {
-    const group = display.group;
-    if (display.placeholder) {
-      group.remove(display.placeholder);
-      disposeDeep(display.placeholder);
-      display.placeholder = null;
-    }
+    clearDisplayContent(display, spinningGroups);
 
     const box = new THREE.Box3().setFromObject(modelScene);
     const size = new THREE.Vector3();
@@ -1917,23 +1958,27 @@
     const spinPivot = new THREE.Group();
     spinPivot.add(modelScene);
     spinPivot.position.y = 0;
-    group.add(spinPivot);
+    display.contentSlot.add(spinPivot);
+    display.spinningRef = spinPivot;
     spinningGroups.push(spinPivot);
   }
 
-  function replacePlaceholderWithImage(display, product, config, spinningGroups) {
-    const url = product.featured_image || (product.images && product.images[0]) || (product.media && product.media[0] && product.media[0].preview_url);
-    const group = display.group;
-    if (display.placeholder) {
-      group.remove(display.placeholder);
-      disposeDeep(display.placeholder);
-      display.placeholder = null;
+  function replacePlaceholderWithImage(display, product, config, spinningGroups, imageUrlOverride, onComplete, expectedEpoch) {
+    clearDisplayContent(display, spinningGroups);
+    const url =
+      imageUrlOverride ||
+      product.featured_image ||
+      (product.images && product.images[0]) ||
+      (product.media && product.media[0] && product.media[0].preview_url);
+    if (!url) {
+      if (typeof onComplete === 'function') onComplete();
+      return;
     }
-    if (!url) return;
 
     new THREE.TextureLoader().setCrossOrigin('anonymous').load(
       url,
       (tex) => {
+        if (expectedEpoch != null && display.contentEpoch !== expectedEpoch) return;
         tex.colorSpace = THREE.SRGBColorSpace;
         const aspect = (tex.image && tex.image.width && tex.image.height) ? tex.image.width / tex.image.height : 1;
         const height = 1.1;
@@ -1959,15 +2004,79 @@
         wrap.add(card);
         const spin = new THREE.Group();
         spin.add(wrap);
-        group.add(spin);
+        display.contentSlot.add(spin);
+        display.spinningRef = spin;
         spinningGroups.push(spin);
+        if (typeof onComplete === 'function') onComplete();
       },
       undefined,
       (err) => {
         console.warn('[boutique] failed to load image for', product.handle, err);
+        if (expectedEpoch == null || display.contentEpoch === expectedEpoch) {
+          if (typeof onComplete === 'function') onComplete();
+        }
       }
     );
   }
+
+  function swapPedestalToVariant(product, variant) {
+    if (!product || !variant) return;
+    const entry = window.__boutiquePedestals && window.__boutiquePedestals[product.id];
+    if (!entry) return;
+    const { display, config, gltfLoader, spinningGroups } = entry;
+    if (display.displayedVariantId === variant.id) return;
+
+    display.contentEpoch = (display.contentEpoch || 0) + 1;
+    const epoch = display.contentEpoch;
+
+    clearDisplayContent(display, spinningGroups);
+
+    const sources = resolveModelSourcesForVariant(product, variant);
+    const src = pickGlb(sources);
+
+    const onDone = () => {
+      if (display.contentEpoch === epoch) {
+        display.displayedVariantId = variant.id;
+      }
+    };
+
+    if (src && src.url) {
+      gltfLoader.load(
+        src.url,
+        (gltf) => {
+          if (display.contentEpoch !== epoch) return;
+          replacePlaceholderWithModel(display, gltf.scene, config, spinningGroups);
+          onDone();
+        },
+        undefined,
+        (err) => {
+          console.warn('[boutique] variant model load failed', product.handle, variant.id, err);
+          if (display.contentEpoch !== epoch) return;
+          replacePlaceholderWithImage(
+            display,
+            product,
+            config,
+            spinningGroups,
+            variant.featured_image || product.featured_image,
+            onDone,
+            epoch
+          );
+        }
+      );
+    } else {
+      replacePlaceholderWithImage(
+        display,
+        product,
+        config,
+        spinningGroups,
+        variant.featured_image || product.featured_image,
+        onDone,
+        epoch
+      );
+    }
+  }
+
+  window.__boutiqueSwapPedestalVariant = swapPedestalToVariant;
 
   function makeLabelSprite(text, config) {
     const canvas = document.createElement('canvas');
@@ -2168,8 +2277,7 @@
     const optionsEl = root.querySelector('[data-boutique-product-options]');
     const descEl = root.querySelector('[data-boutique-product-description]');
     const linkEl = root.querySelector('[data-boutique-product-link]');
-    const mediaEl = root.querySelector('[data-boutique-product-media]');
-    const thumbsEl = root.querySelector('[data-boutique-product-thumbs]');
+    const liveHintEl = root.querySelector('[data-boutique-live-hint]');
     const qtyInput = root.querySelector('[data-boutique-qty]');
     const qtyDecr = root.querySelector('[data-boutique-qty-decr]');
     const qtyIncr = root.querySelector('[data-boutique-qty-incr]');
@@ -2184,6 +2292,9 @@
       dialog.hidden = true;
       addError.hidden = true;
       addError.textContent = '';
+      if (state.product && window.__boutiquePedestals && window.__boutiquePedestals[state.product.id]) {
+        window.__boutiquePedestals[state.product.id].display.displayedVariantId = null;
+      }
     };
     closeEls.forEach((b) => b.addEventListener('click', close));
     document.addEventListener('keydown', (e) => {
@@ -2207,13 +2318,16 @@
     const renderOptions = (product) => {
       optionsEl.innerHTML = '';
       product.options.forEach((opt, i) => {
-        const wrap = document.createElement('div');
-        const head = document.createElement('p');
-        head.className = 'boutique__product-option-name';
-        head.textContent = opt.name;
-        wrap.appendChild(head);
+        const fieldset = document.createElement('fieldset');
+        fieldset.className = 'boutique__product-option-fieldset';
+        const legend = document.createElement('legend');
+        legend.className = 'boutique__product-option-legend';
+        legend.textContent = opt.name;
+        fieldset.appendChild(legend);
         const list = document.createElement('div');
         list.className = 'boutique__product-option-values';
+        list.setAttribute('role', 'group');
+        list.setAttribute('aria-label', opt.name);
         opt.values.forEach((value) => {
           const btn = document.createElement('button');
           btn.type = 'button';
@@ -2242,8 +2356,8 @@
           });
           list.appendChild(btn);
         });
-        wrap.appendChild(list);
-        optionsEl.appendChild(wrap);
+        fieldset.appendChild(list);
+        optionsEl.appendChild(fieldset);
       });
     };
 
@@ -2277,35 +2391,14 @@
         addBtn.disabled = false;
         addLabel.textContent = window.__boutiqueT('add_to_cart');
       }
-      const variantImage = v.featured_image || product.featured_image;
-      renderMedia(product, variantImage);
-    };
-
-    const renderMedia = (product, primaryUrl) => {
-      mediaEl.innerHTML = '';
-      thumbsEl.innerHTML = '';
-      const urls = uniq([primaryUrl, ...(product.images || [])].filter(Boolean));
-      if (urls.length === 0) return;
-      const main = document.createElement('img');
-      main.alt = product.title;
-      main.src = urls[0];
-      main.loading = 'lazy';
-      mediaEl.appendChild(main);
-      urls.forEach((u, idx) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        if (idx === 0) btn.classList.add('is-active');
-        const im = document.createElement('img');
-        im.src = u;
-        im.alt = '';
-        btn.appendChild(im);
-        btn.addEventListener('click', () => {
-          main.src = u;
-          thumbsEl.querySelectorAll('button').forEach((b) => b.classList.remove('is-active'));
-          btn.classList.add('is-active');
-        });
-        thumbsEl.appendChild(btn);
-      });
+      if (liveHintEl) {
+        liveHintEl.classList.add('is-swapping');
+        clearTimeout(liveHintEl._swapHintT);
+        liveHintEl._swapHintT = setTimeout(() => liveHintEl.classList.remove('is-swapping'), 480);
+      }
+      if (typeof window.__boutiqueSwapPedestalVariant === 'function') {
+        window.__boutiqueSwapPedestalVariant(product, v);
+      }
     };
 
     addBtn.addEventListener('click', async () => {
@@ -2356,15 +2449,6 @@
       const focusable = dialog.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
       if (focusable) focusable.focus({ preventScroll: true });
     };
-  }
-
-  function uniq(arr) {
-    const seen = new Set();
-    const out = [];
-    arr.forEach((v) => {
-      if (!seen.has(v)) { seen.add(v); out.push(v); }
-    });
-    return out;
   }
 
   function openProduct(product) {
