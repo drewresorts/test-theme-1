@@ -1,0 +1,5 @@
+.DS_Store
+.env
+streaming/.env
+node_modules/
+*.log
