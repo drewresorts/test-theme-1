@@ -85,5 +85,81 @@
         "url": "URL"
       }
     }
+  },
+  "boutique": {
+    "section": {
+      "name": "3D boutique",
+      "headers": {
+        "content": "Content",
+        "environment": "Environment",
+        "layout": "Layout",
+        "performance": "Performance"
+      },
+      "settings": {
+        "featured_collection": {
+          "label": "Featured collection",
+          "info": "Products from this collection populate the boutique. Leave empty to use the entire catalog. Upload 3D models per product in the product's Media gallery to render them as walk-around objects."
+        },
+        "max_products": {
+          "label": "Maximum products"
+        },
+        "eyebrow": {
+          "label": "Eyebrow"
+        },
+        "heading": {
+          "label": "Heading"
+        },
+        "subheading": {
+          "label": "Subheading"
+        },
+        "cta_label": {
+          "label": "Enter button label"
+        },
+        "floor_color": {
+          "label": "Floor color"
+        },
+        "wall_color": {
+          "label": "Wall color"
+        },
+        "ceiling_color": {
+          "label": "Ceiling color"
+        },
+        "accent_color": {
+          "label": "Accent color"
+        },
+        "floor_texture": {
+          "label": "Floor texture (optional)"
+        },
+        "wall_texture": {
+          "label": "Wall texture (optional)"
+        },
+        "skybox_image": {
+          "label": "Skybox / environment map (optional)",
+          "info": "An equirectangular HDR-style image used as both the visible background and image-based lighting."
+        },
+        "room_radius": {
+          "label": "Room radius"
+        },
+        "pedestal_height": {
+          "label": "Pedestal height"
+        },
+        "quality": {
+          "label": "Quality",
+          "options": {
+            "auto": "Auto",
+            "high": "High",
+            "medium": "Medium",
+            "low": "Low"
+          }
+        },
+        "enable_shadows": {
+          "label": "Enable real-time shadows",
+          "info": "Improves visual fidelity at a measurable performance cost."
+        }
+      },
+      "presets": {
+        "default": "3D boutique"
+      }
+    }
   }
 }
