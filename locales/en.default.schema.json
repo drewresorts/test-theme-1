@@ -92,6 +92,7 @@
       "headers": {
         "content": "Content",
         "environment": "Environment",
+        "custom_glb_environment": "Custom GLB environment",
         "layout": "Layout",
         "performance": "Performance"
       },
@@ -136,6 +137,30 @@
         "skybox_image": {
           "label": "Skybox / environment map (optional)",
           "info": "An equirectangular HDR-style image used as both the visible background and image-based lighting."
+        },
+        "environment_glb_url": {
+          "paragraph": "Load your own interior or showroom as a single glTF/GLB file. Export from Blender with Y-up, origin at floor level, and scale in meters so it lines up with pedestals (~1 m tall).",
+          "label": "Environment GLB URL",
+          "info": "Paste a direct HTTPS link to a .glb file. Upload via Shopify admin → Content → Files, or add the file to your theme’s assets folder and use the asset URL (for example from the theme code editor)."
+        },
+        "hide_procedural_room": {
+          "label": "Hide the default cylinder room",
+          "info": "Turn on when your GLB includes its own floor and walls so they are not duplicated. Leave off to stack your model on top of the built-in room (for props or partial sets)."
+        },
+        "environment_scale_percent": {
+          "label": "Environment scale"
+        },
+        "environment_rotation_y": {
+          "label": "Environment rotation"
+        },
+        "environment_offset_x": {
+          "label": "Environment position (X)"
+        },
+        "environment_offset_y": {
+          "label": "Environment position (Y)"
+        },
+        "environment_offset_z": {
+          "label": "Environment position (Z)"
         },
         "room_radius": {
           "label": "Room radius"
