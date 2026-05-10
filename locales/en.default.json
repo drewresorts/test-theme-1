@@ -1,0 +1,25 @@
+{
+  "general": {
+    "accessibility": {
+      "skip_to_content": "Skip to content"
+    }
+  },
+  "coming_soon": {
+    "countdown": {
+      "days": "Days",
+      "hours": "Hours",
+      "minutes": "Minutes",
+      "seconds": "Seconds"
+    },
+    "signup": {
+      "label": "Get notified when we launch",
+      "placeholder": "your@email.com",
+      "button": "Notify me",
+      "success": "You're on the list. See you at launch."
+    },
+    "sound": {
+      "mute": "Mute",
+      "unmute": "Unmute"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "current": {
+    "background_color": "#0b0b0f",
+    "text_color": "#ffffff",
+    "body_font": "assistant_n4",
+    "stream_origin": ""
+  },
+  "presets": {
+    "Default": {
+      "background_color": "#0b0b0f",
+      "text_color": "#ffffff",
+      "body_font": "assistant_n4"
+    }
+  }
+}

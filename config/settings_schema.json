@@ -1,0 +1,53 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Coming Soon Live",
+    "theme_version": "1.0.0",
+    "theme_author": "Test Theme",
+    "theme_documentation_url": "https://example.com",
+    "theme_support_url": "https://example.com/support"
+  },
+  {
+    "name": "t:settings_schema.colors.name",
+    "settings": [
+      {
+        "type": "color",
+        "id": "background_color",
+        "label": "t:settings_schema.colors.background.label",
+        "default": "#0b0b0f"
+      },
+      {
+        "type": "color",
+        "id": "text_color",
+        "label": "t:settings_schema.colors.text.label",
+        "default": "#ffffff"
+      }
+    ]
+  },
+  {
+    "name": "t:settings_schema.typography.name",
+    "settings": [
+      {
+        "type": "font_picker",
+        "id": "body_font",
+        "label": "t:settings_schema.typography.body.label",
+        "default": "assistant_n4"
+      }
+    ]
+  },
+  {
+    "name": "t:settings_schema.streaming.name",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "t:settings_schema.streaming.intro"
+      },
+      {
+        "type": "url",
+        "id": "stream_origin",
+        "label": "t:settings_schema.streaming.origin.label",
+        "info": "t:settings_schema.streaming.origin.info"
+      }
+    ]
+  }
+]

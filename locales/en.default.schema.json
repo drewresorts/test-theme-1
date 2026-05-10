@@ -1,0 +1,89 @@
+{
+  "settings_schema": {
+    "colors": {
+      "name": "Colors",
+      "background": {
+        "label": "Background"
+      },
+      "text": {
+        "label": "Text"
+      }
+    },
+    "typography": {
+      "name": "Typography",
+      "body": {
+        "label": "Body font"
+      }
+    },
+    "streaming": {
+      "name": "Live stream",
+      "intro": "Set the origin of your live stream so the storefront can preconnect for faster playback. The full stream URL is configured per page in the Coming soon section.",
+      "origin": {
+        "label": "Stream origin",
+        "info": "Example: https://stream.your-domain.com"
+      }
+    }
+  },
+  "coming_soon": {
+    "section": {
+      "name": "Coming soon",
+      "headers": {
+        "stream": "Live video background",
+        "copy": "Copy",
+        "launch": "Launch & signup",
+        "style": "Style"
+      },
+      "settings": {
+        "stream_url": {
+          "label": "Stream URL",
+          "info": "Paste an HLS playlist (.m3u8) or an MP4/WebM file URL. HLS is recommended for live cameras."
+        },
+        "poster_image": {
+          "label": "Fallback image",
+          "info": "Shown before the stream loads, on slow networks, and when reduced motion is enabled."
+        },
+        "mute_audio": {
+          "label": "Start with audio muted"
+        },
+        "eyebrow": {
+          "label": "Eyebrow"
+        },
+        "heading": {
+          "label": "Heading"
+        },
+        "subheading": {
+          "label": "Subheading"
+        },
+        "footer_text": {
+          "label": "Footer note"
+        },
+        "launch_date": {
+          "label": "Launch date",
+          "info": "ISO format, e.g. 2026-06-01T12:00:00Z. Leave empty to hide the countdown."
+        },
+        "show_signup": {
+          "label": "Show email signup"
+        },
+        "overlay_color": {
+          "label": "Overlay color"
+        },
+        "overlay_opacity": {
+          "label": "Overlay opacity"
+        },
+        "accent_color": {
+          "label": "Text & accent color"
+        }
+      },
+      "presets": {
+        "default": "Coming soon"
+      }
+    },
+    "blocks": {
+      "social_link": {
+        "name": "Social link",
+        "label": "Label",
+        "url": "URL"
+      }
+    }
+  }
+}
