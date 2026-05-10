@@ -1,11 +1,22 @@
 {%- liquid
   assign max_products = section.settings.max_products | default: 12
+  assign boutique_use_collection_urls = false
+  assign boutique_catalog_empty = false
 
   if section.settings.featured_collection != blank
     assign source_collection = collections[section.settings.featured_collection]
-    assign products_source = source_collection.products
+    if source_collection != blank
+      assign products_source = source_collection.products
+      assign boutique_use_collection_urls = true
+    else
+      assign products_source = collections.all.products
+    endif
   else
     assign products_source = collections.all.products
+  endif
+
+  if products_source.size == 0
+    assign boutique_catalog_empty = true
   endif
 
   assign floor_color = section.settings.floor_color | default: '#1a1a22'
@@ -29,7 +40,7 @@
 "title":{{ product.title | json }},
 "vendor":{{ product.vendor | json }},
 "type":{{ product.type | json }},
-"url":{{ product.url | within: source_collection | json }},
+"url":{%- if boutique_use_collection_urls -%}{{ product.url | within: source_collection | json }}{%- else -%}{{ product.url | json }}{%- endif -%},
 "available":{{ product.available }},
 "description":{{ product.description | strip_html | strip_newlines | truncate: 600 | json }},
 "price_min":{{ product.price_min | json }},
@@ -136,7 +147,7 @@
       <ul class="boutique__noscript-list">
         {%- for product in products_source limit: max_products -%}
           <li>
-            <a href="{{ product.url | within: source_collection }}">
+            <a href="{% if boutique_use_collection_urls %}{{ product.url | within: source_collection }}{% else %}{{ product.url }}{% endif %}">
               {%- if product.featured_image -%}
                 {{ product.featured_image | image_url: width: 600 | image_tag: loading: 'lazy', alt: product.title }}
               {%- endif -%}
@@ -160,7 +171,19 @@
       {%- if section.settings.subheading != blank -%}
         <p class="boutique__subheading">{{ section.settings.subheading }}</p>
       {%- endif -%}
-      <button type="button" class="boutique__enter" data-boutique-enter>
+      {%- if boutique_catalog_empty -%}
+        <p class="boutique__empty-catalog">{{ 'boutique.intro.empty_catalog' | t }}</p>
+      {%- endif -%}
+      <button
+        type="button"
+        class="boutique__enter"
+        data-boutique-enter
+        {% if boutique_catalog_empty %}
+          hidden
+          disabled
+          aria-disabled="true"
+        {% endif %}
+      >
         {{ section.settings.cta_label | default: 'Enter the boutique' | escape }}
       </button>
       <div class="boutique__legend" aria-hidden="true">
@@ -268,7 +291,7 @@
       <ul class="boutique__fallback-grid">
         {%- for product in products_source limit: max_products -%}
           <li class="boutique__fallback-card">
-            <a href="{{ product.url | within: source_collection }}">
+            <a href="{% if boutique_use_collection_urls %}{{ product.url | within: source_collection }}{% else %}{{ product.url }}{% endif %}">
               {%- if product.featured_image -%}
                 {{
                   product.featured_image
@@ -432,6 +455,14 @@
     font-family: ui-monospace, monospace;
     font-size: 0.72rem;
     margin-right: 0.15rem;
+  }
+
+  .boutique__empty-catalog {
+    margin: 0;
+    max-width: 48ch;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    color: #ffb4b4;
   }
 
   .boutique__skip {
@@ -1281,10 +1312,15 @@
     const joystick = root.querySelector('[data-boutique-joystick]');
     const joystickStick = root.querySelector('[data-boutique-joystick-stick]');
 
+    initCart(root);
+
     if (products.length === 0) {
       showIntroOnly(root, intro, loading);
+      if (skipBtn) skipBtn.focus();
       return;
     }
+
+    setupProductDialog(root, products, config);
 
     intro.hidden = false;
 
@@ -1326,15 +1362,12 @@
       }
     };
 
-    enterBtn.addEventListener('click', () => start(true));
-    skipBtn.addEventListener('click', () => start(false));
-
-    setupProductDialog(root, products, config);
-    initCart(root);
+    if (enterBtn) enterBtn.addEventListener('click', () => start(true));
+    if (skipBtn) skipBtn.addEventListener('click', () => start(false));
 
     if (reduceMotion) {
-      skipBtn.focus();
-    } else {
+      if (skipBtn) skipBtn.focus();
+    } else if (enterBtn && !enterBtn.disabled) {
       enterBtn.focus();
     }
   }
@@ -1370,7 +1403,10 @@
 
   async function runScene(root, products, config, els) {
     const stage = els.stage;
-    const dpr = Math.min(window.devicePixelRatio || 1, config.quality === 'low' ? 1 : 2);
+    let dprCap = 2;
+    if (config.quality === 'low') dprCap = 1;
+    else if (config.quality === 'medium') dprCap = 1.5;
+    const dpr = Math.min(window.devicePixelRatio || 1, dprCap);
     const enableShadows = !!config.enableShadows;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
@@ -1435,6 +1471,15 @@
 
     const controls = new PointerLockControls(camera, renderer.domElement);
     scene.add(controls.getObject());
+
+    const onUnlockPointer = () => {
+      try {
+        controls.unlock();
+      } catch (_e) {
+        /* ignore */
+      }
+    };
+    document.addEventListener('boutique-unlock-pointer', onUnlockPointer);
 
     const movement = { forward: 0, strafe: 0, sprint: false };
     const direction = new THREE.Vector3();
@@ -1597,9 +1642,16 @@
     const tick = () => {
       const delta = Math.min(clock.getDelta(), 0.05);
 
+      if (isProductDialogOpen()) {
+        movement.forward = 0;
+        movement.strafe = 0;
+        movement.sprint = false;
+      }
+
       if (controls.isLocked || movement.forward !== 0 || movement.strafe !== 0) {
         const speed = (movement.sprint ? playerSprint : playerSpeed) * delta;
-        direction.set(movement.strafe, 0, -movement.forward).normalize();
+        direction.set(movement.strafe, 0, -movement.forward);
+        if (direction.lengthSq() > 1e-6) direction.normalize();
         const obj = controls.getObject();
         const forward = new THREE.Vector3();
         camera.getWorldDirection(forward); forward.y = 0; forward.normalize();
@@ -2284,8 +2336,10 @@
     });
 
     window.__boutiqueOpenProduct = (product) => {
+      if (!product || !Array.isArray(product.variants) || product.variants.length === 0) return;
       state.product = product;
       const firstAvailable = product.variants.find((v) => v.available) || product.variants[0];
+      if (!firstAvailable) return;
       state.variant = firstAvailable;
       state.selectedOptions = (firstAvailable.options || []).slice();
       titleEl.textContent = product.title;
@@ -2347,8 +2401,10 @@
     const cart = root.querySelector('[data-boutique-cart]');
     const toggle = root.querySelector('[data-boutique-cart-toggle]');
     const closes = root.querySelectorAll('[data-boutique-cart-close]');
+    if (!cart || !toggle) return;
 
     toggle.addEventListener('click', async () => {
+      document.dispatchEvent(new Event('boutique-unlock-pointer'));
       cart.hidden = !cart.hidden;
       if (!cart.hidden) await refreshCart(root);
     });
@@ -2371,6 +2427,12 @@
       const emptyEl = root.querySelector('[data-boutique-cart-empty]');
       const subtotalEl = root.querySelector('[data-boutique-cart-subtotal]');
       const countEl = root.querySelector('[data-boutique-cart-count]');
+      if (!itemsEl || !emptyEl || !subtotalEl || !countEl) return;
+      const currencyCode =
+        (typeof data.currency === 'string' && data.currency) ||
+        data.currency_code ||
+        root.dataset.shopCurrency ||
+        'USD';
       countEl.textContent = String(data.item_count || 0);
       itemsEl.innerHTML = '';
       if (!data.items || data.items.length === 0) {
@@ -2393,7 +2455,9 @@
           variant.textContent = (item.variant_title && item.variant_title !== 'Default Title') ? item.variant_title : '';
           const price = document.createElement('span');
           price.className = 'boutique__cart-variant';
-          price.textContent = formatMoney(item.line_price, data.currency);
+          const lineCents =
+            item.final_line_price != null ? item.final_line_price : item.line_price;
+          price.textContent = formatMoney(lineCents, currencyCode);
           meta.appendChild(title);
           if (variant.textContent) meta.appendChild(variant);
           meta.appendChild(price);
@@ -2420,7 +2484,7 @@
           itemsEl.appendChild(li);
         });
       }
-      subtotalEl.textContent = formatMoney(data.total_price, data.currency);
+      subtotalEl.textContent = formatMoney(data.total_price, currencyCode);
     } catch (e) {
       console.warn('[boutique] cart fetch failed', e);
     }
@@ -2476,7 +2540,9 @@
     let s = dict[key] || key;
     if (vars) {
       Object.keys(vars).forEach((k) => {
-        s = s.replace(new RegExp('\\{\\{\\s*' + k + '\\s*\\}\\}', 'g'), String(vars[k]));
+        const esc = k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        s = s.replace(new RegExp('\\[\\[' + esc + '\\]\\]', 'g'), String(vars[k]));
+        s = s.replace(new RegExp('\\{\\{\\s*' + esc + '\\s*\\}\\}', 'g'), String(vars[k]));
       });
     }
     return s;

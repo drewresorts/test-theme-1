@@ -25,7 +25,8 @@
   "boutique": {
     "loading": "Building the boutique\u2026",
     "intro": {
-      "skip_3d": "Browse a 2D list instead"
+      "skip_3d": "Browse a 2D list instead",
+      "empty_catalog": "There are no products in this collection yet. Add products in the admin or pick a different collection in the theme editor."
     },
     "legend": {
       "move": "to walk",
@@ -49,11 +50,11 @@
       "qty_plus": "Increase quantity",
       "add": "Add to cart",
       "added": "Added \u2713",
-      "added_n": "Added \u2018{{ title }}\u2019 \u00d7 {{ count }} to your cart.",
+      "added_n": "Added \u2018[[title]]\u2019 \u00d7 [[count]] to your cart.",
       "sold_out": "Sold out",
       "out_of_stock": "Out of stock",
       "in_stock": "In stock",
-      "low_stock_n": "Only {{ count }} left",
+      "low_stock_n": "Only [[count]] left",
       "view_full": "View full details",
       "error_generic": "We couldn\u2019t add that to the cart. Please try again."
     },
