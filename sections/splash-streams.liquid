@@ -50,6 +50,8 @@
     Tap to use your camera
   </button>
 
+  <span class="splash-streams__record-light" aria-hidden="true"></span>
+
   <a class="splash-streams__logo" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
     {%- if logo_image -%}
       {{
@@ -231,6 +233,63 @@
     color: #fff;
   }
 
+  @media (max-width: 749px) {
+    .splash-streams__logo-img {
+      width: min(86vw, calc(var(--logo-width) * 0.5));
+    }
+
+    .splash-streams__logo-text {
+      font-size: clamp(0.625rem, 2vw, 1rem);
+    }
+  }
+
+  .splash-streams__record-light {
+    position: absolute;
+    top: max(0.75rem, env(safe-area-inset-top));
+    right: max(0.75rem, env(safe-area-inset-right));
+    z-index: 3;
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 50%;
+    background: #ff2d3a;
+    box-shadow:
+      0 0 0 2px rgba(0, 0, 0, 0.4),
+      0 0 12px rgba(255, 45, 58, 0.85);
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .splash-streams--camera-live .splash-streams__record-light {
+    opacity: 1;
+    visibility: visible;
+    animation: splash-streams-record-blink 1s ease-in-out infinite;
+  }
+
+  @keyframes splash-streams-record-blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.28;
+    }
+  }
+
+  @media (min-width: 750px) {
+    .splash-streams__record-light {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .splash-streams--camera-live .splash-streams__record-light {
+      animation: none;
+      opacity: 1;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .splash-streams__selfie-shell {
       display: none !important;
@@ -321,6 +380,7 @@
     let index = 0;
 
     function stopSelfie() {
+      root.classList.remove('splash-streams--camera-live');
       try {
         const ms = selfieVideo.srcObject;
         if (ms && ms.getTracks) {
@@ -374,6 +434,9 @@
             root.classList.remove('splash-streams--selfie-fallback');
             iframe.src = 'about:blank';
             hideCameraPrompt();
+            if (isMobile()) {
+              root.classList.add('splash-streams--camera-live');
+            }
             return true;
           });
         })
