@@ -38,9 +38,9 @@
       ],
       "name": "Splash streams",
       "settings": {
-        "logo_width": 260,
-        "overlay_color": "#ff3819",
-        "overlay_opacity": 10
+        "logo_width": 480,
+        "overlay_color": "#ffffff",
+        "overlay_opacity": 30
       }
     }
   },
