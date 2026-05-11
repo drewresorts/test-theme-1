@@ -136,6 +136,8 @@
 </section>
 
 {% stylesheet %}
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap');
+
   .splash-streams {
     position: relative;
     display: grid;
@@ -317,12 +319,13 @@
     display: none;
     position: relative;
     z-index: 19;
-    width: min(18rem, calc(100vw - 2 * max(0.65rem, env(safe-area-inset-left))));
+    width: min(92vw, 40rem);
     margin: 0;
     padding: 0;
     background: transparent;
     border: 0;
     pointer-events: none;
+    font-size: 1rem;
   }
 
   .splash-streams--nav-open .splash-streams__nav {
@@ -336,32 +339,36 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 0.75rem;
   }
 
   .splash-streams__nav-link {
     display: block;
     width: 100%;
     text-align: left;
-    padding: 0.55rem 0.15rem;
+    padding: 0.35rem 0.15rem;
     border: 0;
     background: transparent;
     color: #fff;
-    font: inherit;
-    font-size: 0.95rem;
-    font-weight: 500;
-    letter-spacing: 0.04em;
+    font-family: 'Roboto', ui-sans-serif, system-ui, sans-serif;
+    font-size: 400%;
+    font-weight: 700;
+    font-style: normal;
+    letter-spacing: 0.02em;
+    line-height: 1.1;
     text-decoration: none;
-    text-shadow:
-      0 0 6px #000,
-      0 1px 2px #000;
+    text-transform: lowercase;
+    text-shadow: none;
     cursor: pointer;
   }
 
   .splash-streams__nav-link--sub {
-    font-size: 0.88rem;
-    font-weight: 400;
-    padding-left: 0.5rem;
+    font-size: 400%;
+    font-weight: 700;
+    font-family: 'Roboto', ui-sans-serif, system-ui, sans-serif;
+    text-transform: lowercase;
+    text-shadow: none;
+    padding-left: 0.35rem;
   }
 
   .splash-streams__nav-sublist {
@@ -375,12 +382,14 @@
     display: block;
     margin: 0;
     padding: 0.35rem 0;
-    font-size: 0.8rem;
-    font-weight: 400;
-    color: color-mix(in srgb, #fff 80%, transparent);
-    text-shadow:
-      0 0 6px #000,
-      0 1px 2px #000;
+    font-family: 'Roboto', ui-sans-serif, system-ui, sans-serif;
+    font-size: 400%;
+    font-weight: 700;
+    color: color-mix(in srgb, #fff 88%, transparent);
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+    text-transform: lowercase;
+    text-shadow: none;
   }
 
   .splash-streams__nav-link:focus-visible,
