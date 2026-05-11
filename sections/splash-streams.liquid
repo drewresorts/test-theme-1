@@ -344,19 +344,18 @@
   }
 
   .splash-streams--nav-open .splash-streams__nav-cluster {
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
+    flex-wrap: nowrap;
     align-items: center;
     justify-content: center;
-    gap: clamp(0.3rem, 1vw, 0.65rem);
-    max-width: min(98vw, 90rem);
+    gap: clamp(0.45rem, 1.5vh, 1rem);
+    max-width: min(96vw, 40rem);
     pointer-events: auto;
   }
 
   @media (max-width: 749px) {
     .splash-streams--nav-open .splash-streams__nav-cluster {
-      flex-direction: column;
-      gap: clamp(0.45rem, 1.5vh, 1rem);
+      max-width: 100%;
     }
   }
 
@@ -423,11 +422,11 @@
 
   @media (min-width: 750px) {
     .splash-streams--nav-open .splash-streams__nav-list {
-      flex-direction: row;
-      flex-wrap: wrap;
+      flex-direction: column;
+      flex-wrap: nowrap;
       justify-content: center;
       align-items: center;
-      column-gap: clamp(0.45rem, 1.1vw, 1rem);
+      column-gap: 0;
       row-gap: clamp(0.35rem, 1vh, 0.65rem);
     }
   }
@@ -446,9 +445,7 @@
 
   @media (min-width: 750px) {
     .splash-streams--nav-open .splash-streams__nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      display: block;
       max-width: none;
     }
   }
