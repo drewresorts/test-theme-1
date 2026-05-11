@@ -38,9 +38,11 @@
       ],
       "name": "Splash streams",
       "settings": {
-        "logo_width": 480,
-        "overlay_color": "#ffffff",
-        "overlay_opacity": 30
+        "menu": "main-menu",
+        "menu_logo": "shopify://shop_images/duet_web_menu_star.png",
+        "logo_width": 430,
+        "overlay_color": "#009fff",
+        "overlay_opacity": 40
       }
     }
   },
