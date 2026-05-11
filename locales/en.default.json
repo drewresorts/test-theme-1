@@ -274,6 +274,15 @@
       "announcement": "Announcement",
       "announcement_bar": "Announcement bar"
     },
+    "product_live_stream": {
+      "empty": "This section only appears on product pages.",
+      "nav_label": "Store menu",
+      "menu_empty": "Select a navigation menu in the theme editor."
+    },
+    "collections_live": {
+      "nav_label": "Store menu",
+      "menu_empty": "Select a navigation menu in the theme editor."
+    },
     "header": {
       "announcement": "Announcement",
       "menu": "Menu",
