@@ -1,0 +1,392 @@
+{%- liquid
+  assign logo_image = section.settings.logo_image
+  assign logo_width = section.settings.logo_width | default: 240
+  assign overlay_opacity = section.settings.overlay_opacity | default: 35
+  assign overlay_color = section.settings.overlay_color | default: '#000000'
+
+  assign stream_blocks = section.blocks | where: 'type', 'stream'
+-%}
+
+<section
+  class="splash-streams"
+  data-splash-streams
+  style="
+    --overlay-color: {{ overlay_color }};
+    --overlay-opacity: {{ overlay_opacity | divided_by: 100.0 }};
+    --logo-width: {{ logo_width }}px;
+  "
+>
+  <div class="splash-streams__bg" aria-hidden="true">
+    <div class="splash-streams__player" data-splash-streams-player></div>
+    <div class="splash-streams__overlay"></div>
+  </div>
+
+  <div class="splash-streams__center">
+    <a class="splash-streams__logo" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
+      {%- if logo_image -%}
+        {{
+          logo_image
+          | image_url: width: logo_width | times: 2
+          | image_tag:
+            width: logo_width,
+            loading: 'eager',
+            decoding: 'async',
+            alt: shop.name,
+            class: 'splash-streams__logo-img'
+        }}
+      {%- else -%}
+        <span class="splash-streams__logo-text">{{ shop.name }}</span>
+      {%- endif -%}
+    </a>
+  </div>
+
+  <template data-splash-streams-data>
+    [
+      {%- for block in stream_blocks -%}
+        {%- liquid
+          assign raw = block.settings.youtube_url | strip
+        -%}
+        { "url": {{ raw | json }} }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ]
+  </template>
+</section>
+
+{% stylesheet %}
+  .splash-streams {
+    position: relative;
+    min-height: 100svh;
+    width: 100%;
+    overflow: hidden;
+    isolation: isolate;
+    background: #000;
+  }
+
+  .splash-streams__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .splash-streams__player {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .splash-streams__player iframe {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    transform: translate(-50%, -50%);
+    width: max(100vw, 177.78vh);
+    height: max(56.25vw, 100vh);
+    pointer-events: none;
+  }
+
+  .splash-streams__overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--overlay-color);
+    opacity: var(--overlay-opacity);
+    pointer-events: none;
+  }
+
+  .splash-streams__center {
+    position: relative;
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    padding: 3rem 1.25rem;
+  }
+
+  .splash-streams__logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, var(--overlay-color) 20%, transparent);
+    backdrop-filter: blur(2px);
+    transition: transform 120ms ease, opacity 120ms ease;
+  }
+
+  .splash-streams__logo:hover,
+  .splash-streams__logo:focus-visible {
+    transform: scale(1.02);
+    opacity: 0.95;
+    outline: none;
+  }
+
+  .splash-streams__logo-img {
+    width: min(86vw, var(--logo-width));
+    height: auto;
+  }
+
+  .splash-streams__logo-text {
+    font-family: var(--font-body-family, system-ui, sans-serif);
+    font-size: clamp(1.25rem, 4vw, 2rem);
+    letter-spacing: 0.04em;
+    color: #fff;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .splash-streams__player {
+      display: none;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function () {
+    const root = document.querySelector('[data-splash-streams]');
+    if (!root) return;
+
+    const playerMount = root.querySelector('[data-splash-streams-player]');
+    const dataEl = root.querySelector('[data-splash-streams-data]');
+    if (!playerMount || !dataEl) return;
+
+    let streams = [];
+    try {
+      streams = JSON.parse(dataEl.innerHTML || '[]');
+    } catch (e) {
+      streams = [];
+    }
+    streams = (streams || []).filter((s) => s && typeof s.url === 'string' && s.url.trim().length > 0);
+    if (streams.length === 0) return;
+
+    const prefersReducedMotion =
+      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
+    function parseYouTubeId(inputUrl) {
+      const raw = (inputUrl || '').trim();
+      if (!raw) return null;
+      try {
+        const url = new URL(raw, window.location.origin);
+        if (url.hostname === 'youtu.be') {
+          return (url.pathname || '').replace('/', '') || null;
+        }
+        if (url.hostname.endsWith('youtube.com')) {
+          const v = url.searchParams.get('v');
+          if (v) return v;
+          const match = (url.pathname || '').match(/\/(live|embed|shorts)\/([^/?#]+)/i);
+          if (match && match[2]) return match[2];
+        }
+      } catch (e) {
+        // ignore
+      }
+      const fallbackMatch = raw.match(/[?&]v=([^&]+)/);
+      if (fallbackMatch && fallbackMatch[1]) return fallbackMatch[1];
+      return null;
+    }
+
+    const ids = streams
+      .map((s) => parseYouTubeId(s.url))
+      .filter(Boolean);
+    if (ids.length === 0) return;
+
+    let index = 0;
+    let player = null;
+    let pendingSwitch = null;
+
+    function loadYouTubeApi() {
+      return new Promise((resolve, reject) => {
+        if (window.YT && window.YT.Player) {
+          resolve(window.YT);
+          return;
+        }
+        const existing = document.querySelector('script[data-youtube-iframe-api]');
+        if (existing) {
+          const wait = setInterval(() => {
+            if (window.YT && window.YT.Player) {
+              clearInterval(wait);
+              resolve(window.YT);
+            }
+          }, 50);
+          setTimeout(() => {
+            clearInterval(wait);
+            if (window.YT && window.YT.Player) resolve(window.YT);
+            else reject(new Error('YouTube API load timeout'));
+          }, 8000);
+          return;
+        }
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        tag.async = true;
+        tag.dataset.youtubeIframeApi = 'true';
+        tag.onerror = reject;
+        document.head.appendChild(tag);
+        const previous = window.onYouTubeIframeAPIReady;
+        window.onYouTubeIframeAPIReady = function () {
+          if (typeof previous === 'function') previous();
+          resolve(window.YT);
+        };
+      });
+    }
+
+    function ensurePlayingLive() {
+      if (!player) return;
+      try {
+        player.mute();
+        player.playVideo();
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    function switchTo(nextIndex) {
+      if (!player) {
+        pendingSwitch = nextIndex;
+        return;
+      }
+      index = (nextIndex + ids.length) % ids.length;
+      const videoId = ids[index];
+      try {
+        player.mute();
+        player.loadVideoById({ videoId: videoId });
+      } catch (e) {
+        // ignore
+      }
+      setTimeout(ensurePlayingLive, 200);
+      setTimeout(ensurePlayingLive, 1200);
+    }
+
+    function onKeyDown(e) {
+      if (!e) return;
+      const tag = (e.target && e.target.tagName) ? String(e.target.tagName).toLowerCase() : '';
+      const editable =
+        tag === 'input' || tag === 'textarea' || tag === 'select' || (e.target && e.target.isContentEditable);
+      if (editable) return;
+
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        switchTo(index - 1);
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        switchTo(index + 1);
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown);
+
+    loadYouTubeApi()
+      .then(() => {
+        player = new window.YT.Player(playerMount, {
+          width: '100%',
+          height: '100%',
+          videoId: ids[index],
+          playerVars: {
+            autoplay: 1,
+            controls: 0,
+            mute: 1,
+            playsinline: 1,
+            modestbranding: 1,
+            rel: 0,
+            fs: 0,
+            iv_load_policy: 3,
+            disablekb: 1,
+          },
+          events: {
+            onReady: function () {
+              ensurePlayingLive();
+              if (typeof pendingSwitch === 'number') {
+                const next = pendingSwitch;
+                pendingSwitch = null;
+                switchTo(next);
+              }
+            },
+            onStateChange: function (evt) {
+              // If the live stream ends or fails, try the next one.
+              if (!evt || typeof evt.data !== 'number') return;
+              if (evt.data === window.YT.PlayerState.ENDED) {
+                switchTo(index + 1);
+                return;
+              }
+              if (evt.data === window.YT.PlayerState.PAUSED) {
+                ensurePlayingLive();
+              }
+            },
+            onError: function () {
+              switchTo(index + 1);
+            },
+          },
+        });
+
+        // Keep nudging playback in case the browser suspends it.
+        setInterval(() => {
+          if (!player) return;
+          ensurePlayingLive();
+        }, 30000);
+      })
+      .catch(() => {
+        // fail silently
+      });
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Splash streams",
+  "tag": "section",
+  "class": "section--splash-streams",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo_image",
+      "label": "Logo image"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Logo width",
+      "min": 120,
+      "max": 520,
+      "step": 10,
+      "unit": "px",
+      "default": 260
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 35
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stream",
+      "name": "YouTube stream",
+      "settings": [
+        {
+          "type": "text",
+          "id": "youtube_url",
+          "label": "YouTube URL",
+          "default": "https://www.youtube.com/watch?v=erBoOFKTH4E"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Splash streams",
+      "blocks": [
+        { "type": "stream" },
+        { "type": "stream" }
+      ]
+    }
+  ]
+}
+{% endschema %}
