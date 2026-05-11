@@ -62,71 +62,72 @@
       hidden
     ></button>
 
-    <button
-      type="button"
-      class="splash-streams__logo-toggle"
-      data-splash-logo-toggle
-      aria-expanded="false"
-      aria-controls="SplashStreamsNav"
-      aria-label="Menu"
-    >
-      <span class="splash-streams__logo-toggle-inner">
-        {%- if logo_image != blank and menu_logo != blank -%}
-          {{
-            logo_image
-            | image_url: width: logo_src_width
-            | image_tag:
-              width: logo_width,
-              loading: 'eager',
-              decoding: 'async',
-              alt: '',
-              class: 'splash-streams__logo-img splash-streams__logo-img--default'
-          }}
-          {{
-            menu_logo
-            | image_url: width: logo_src_width
-            | image_tag:
-              width: logo_width,
-              loading: 'eager',
-              decoding: 'async',
-              alt: '',
-              class: 'splash-streams__logo-img splash-streams__logo-img--menu'
-          }}
-        {%- elsif logo_image != blank -%}
-          {{
-            logo_image
-            | image_url: width: logo_src_width
-            | image_tag:
-              width: logo_width,
-              loading: 'eager',
-              decoding: 'async',
-              alt: '',
-              class: 'splash-streams__logo-img splash-streams__logo-img--default'
-          }}
-        {%- elsif menu_logo != blank -%}
-          {{
-            menu_logo
-            | image_url: width: logo_src_width
-            | image_tag:
-              width: logo_width,
-              loading: 'eager',
-              decoding: 'async',
-              alt: '',
-              class: 'splash-streams__logo-img splash-streams__logo-img--default'
-          }}
-        {%- else -%}
-          <span class="splash-streams__logo-text splash-streams__logo-text--default">{{ shop.name }}</span>
-        {%- endif -%}
-      </span>
-    </button>
+    <div class="splash-streams__nav-cluster" data-splash-nav-cluster>
+      <button
+        type="button"
+        class="splash-streams__logo-toggle"
+        data-splash-logo-toggle
+        aria-expanded="false"
+        aria-controls="SplashStreamsNav"
+        aria-label="Menu"
+      >
+        <span class="splash-streams__logo-toggle-inner">
+          {%- if logo_image != blank and menu_logo != blank -%}
+            {{
+              logo_image
+              | image_url: width: logo_src_width
+              | image_tag:
+                width: logo_width,
+                loading: 'eager',
+                decoding: 'async',
+                alt: '',
+                class: 'splash-streams__logo-img splash-streams__logo-img--default'
+            }}
+            {{
+              menu_logo
+              | image_url: width: logo_src_width
+              | image_tag:
+                width: logo_width,
+                loading: 'eager',
+                decoding: 'async',
+                alt: '',
+                class: 'splash-streams__logo-img splash-streams__logo-img--menu'
+            }}
+          {%- elsif logo_image != blank -%}
+            {{
+              logo_image
+              | image_url: width: logo_src_width
+              | image_tag:
+                width: logo_width,
+                loading: 'eager',
+                decoding: 'async',
+                alt: '',
+                class: 'splash-streams__logo-img splash-streams__logo-img--default'
+            }}
+          {%- elsif menu_logo != blank -%}
+            {{
+              menu_logo
+              | image_url: width: logo_src_width
+              | image_tag:
+                width: logo_width,
+                loading: 'eager',
+                decoding: 'async',
+                alt: '',
+                class: 'splash-streams__logo-img splash-streams__logo-img--default'
+            }}
+          {%- else -%}
+            <span class="splash-streams__logo-text splash-streams__logo-text--default">{{ shop.name }}</span>
+          {%- endif -%}
+        </span>
+      </button>
 
-    <nav
-      id="SplashStreamsNav"
-      class="splash-streams__nav"
-      data-splash-nav
-      aria-label="{% if splash_menu != blank %}{{ splash_menu.title | escape }}{% else %}Menu{% endif %}"
-      hidden
-    >
+      <nav
+        id="SplashStreamsNav"
+        class="splash-streams__nav"
+        data-splash-nav
+        aria-label="{% if splash_menu != blank %}{{ splash_menu.title | escape }}{% else %}Menu{% endif %}"
+        hidden
+      >
       <ul class="splash-streams__nav-list" role="list">
         {%- if splash_menu != blank and splash_menu.links.size > 0 -%}
           {%- for link in splash_menu.links -%}
@@ -151,7 +152,8 @@
           </li>
         {%- endif -%}
       </ul>
-    </nav>
+      </nav>
+    </div>
   </div>
 
   {%- if stream_blocks.size > 0 -%}
@@ -315,14 +317,47 @@
     pointer-events: auto;
   }
 
+  .splash-streams__nav-cluster {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 21;
+    pointer-events: none;
+  }
+
+  .splash-streams__nav-cluster > * {
+    pointer-events: auto;
+  }
+
   .splash-streams--nav-open .splash-streams__chrome {
     position: fixed;
     inset: 0;
     z-index: 20;
     place-self: stretch;
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 0;
     pointer-events: none;
+  }
+
+  .splash-streams--nav-open .splash-streams__nav-cluster {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.3rem, 1vw, 0.65rem);
+    max-width: min(98vw, 90rem);
+    pointer-events: auto;
+  }
+
+  @media (max-width: 749px) {
+    .splash-streams--nav-open .splash-streams__nav-cluster {
+      flex-direction: column;
+      gap: clamp(0.45rem, 1.5vh, 1rem);
+    }
   }
 
   .splash-streams__nav-backdrop {
@@ -365,10 +400,10 @@
   .splash-streams--nav-open .splash-streams__nav {
     display: block;
     pointer-events: auto;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, calc(-50% - clamp(0.45rem, 1.25vh, 0.95rem)));
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
     margin: 0;
   }
 
@@ -391,9 +426,9 @@
       flex-direction: row;
       flex-wrap: wrap;
       justify-content: center;
-      align-items: flex-start;
-      column-gap: clamp(0.65rem, 1.4vw, 1.35rem);
-      row-gap: clamp(0.45rem, 1.2vh, 1rem);
+      align-items: center;
+      column-gap: clamp(0.45rem, 1.1vw, 1rem);
+      row-gap: clamp(0.35rem, 1vh, 0.65rem);
     }
   }
 
@@ -414,7 +449,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      max-width: min(24rem, 28vw);
+      max-width: none;
     }
   }
 
@@ -522,19 +557,27 @@
   }
 
   .splash-streams--nav-open .splash-streams__logo-toggle {
-    position: absolute;
-    top: max(0.4rem, env(safe-area-inset-top));
-    left: 50%;
+    position: relative;
+    top: auto;
+    left: auto;
     z-index: 22;
-    transform: translateX(-50%) scale(0.28);
-    transform-origin: top center;
+    flex: 0 0 auto;
+    transform: none;
+    align-self: center;
+  }
+
+  @media (min-width: 750px) {
+    .splash-streams--nav-open .splash-streams__logo-toggle .splash-streams__logo-img,
+    .splash-streams--nav-open .splash-streams__logo-toggle .splash-streams__logo-img--default,
+    .splash-streams--nav-open .splash-streams__logo-toggle .splash-streams__logo-img--menu {
+      width: auto;
+      height: clamp(3.25rem, 5.5vw, 4.5rem);
+      max-height: 4.75rem;
+      max-width: min(20vw, 5.5rem);
+    }
   }
 
   @media (max-width: 749px) {
-    .splash-streams--nav-open .splash-streams__logo-toggle {
-      transform: translateX(-50%);
-    }
-
     .splash-streams--nav-open .splash-streams__logo-toggle .splash-streams__logo-img,
     .splash-streams--nav-open .splash-streams__logo-toggle .splash-streams__logo-img--default,
     .splash-streams--nav-open .splash-streams__logo-toggle .splash-streams__logo-img--menu {
