@@ -6,6 +6,21 @@
         "title": "Collections",
         "sort": "alphabetical",
         "image_ratio": "square"
+      "type": "collections-live-stream",
+      "settings": {
+        "menu": "main-menu",
+        "show_second_link_decor": true,
+        "vertical_title": "collections",
+        "vertical_title_color": "#0a1f4a",
+        "nav_logo_width": 48,
+        "youtube_url": "https://www.youtube.com/watch?v=erBoOFKTH4E",
+        "overlay_color": "#5a7a9a",
+        "overlay_opacity": 45,
+        "accent_shop_color": "#e85d4c",
+        "show_live_clock": true,
+        "sort": "alphabetical",
+        "columns_desktop": 3,
+        "columns_mobile": "2"
       }
     }
   },
