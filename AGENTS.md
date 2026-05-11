@@ -2,7 +2,7 @@
 
 ## Cursor Cloud specific instructions
 
-This is a **Shopify theme** ("Coming Soon Live") — pure Liquid/HTML/CSS/JS with no build steps and no `package.json`. The only tool needed is **Shopify CLI** (installed globally via `npm install -g @shopify/cli@latest`).
+This is a **Shopify theme** ("Coming Soon Live") built on **[Shopify Dawn](https://github.com/Shopify/dawn)** as the storefront base, plus custom sections (3D boutique, coming soon, splash streams). It is pure Liquid/HTML/CSS/JS with no theme build step and no root `package.json`. The only tool needed is **Shopify CLI** (installed globally via `npm install -g @shopify/cli@latest`).
 
 ### Key commands
 
@@ -14,7 +14,7 @@ This is a **Shopify theme** ("Coming Soon Live") — pure Liquid/HTML/CSS/JS wit
 
 ### Repo structure
 
-- Theme files live at the repo root (`config/`, `layout/`, `locales/`, `sections/`, `templates/`).
+- Theme files live at the repo root (`config/`, `layout/`, `locales/`, `sections/`, `snippets/`, `templates/`, `assets/`). Dawn provides the standard product, collection, cart, blog, and customer templates; custom templates include `page.coming-soon.json` and `page.splash-streams.json`.
 - `streaming/` is a separate Docker Compose stack (MediaMTX + Caddy) for the self-hosted live stream server. It is excluded from Shopify via `.shopifyignore` and is **optional** for theme development.
 - There are no automated test suites; `shopify theme check` is the primary validation tool.
 
