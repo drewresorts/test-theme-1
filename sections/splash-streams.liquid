@@ -23,31 +23,29 @@
       data-splash-streams-iframe
       title=""
       frameborder="0"
-      allow="autoplay; encrypted-media; picture-in-picture"
+      allow="autoplay; encrypted-media"
       referrerpolicy="strict-origin-when-cross-origin"
       tabindex="-1"
     ></iframe>
     <div class="splash-streams__overlay"></div>
   </div>
 
-  <div class="splash-streams__center">
-    <a class="splash-streams__logo" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
-      {%- if logo_image -%}
-        {{
-          logo_image
-          | image_url: width: logo_src_width
-          | image_tag:
-            width: logo_width,
-            loading: 'eager',
-            decoding: 'async',
-            alt: shop.name,
-            class: 'splash-streams__logo-img'
-        }}
-      {%- else -%}
-        <span class="splash-streams__logo-text">{{ shop.name }}</span>
-      {%- endif -%}
-    </a>
-  </div>
+  <a class="splash-streams__logo" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
+    {%- if logo_image -%}
+      {{
+        logo_image
+        | image_url: width: logo_src_width
+        | image_tag:
+          width: logo_width,
+          loading: 'eager',
+          decoding: 'async',
+          alt: shop.name,
+          class: 'splash-streams__logo-img'
+      }}
+    {%- else -%}
+      <span class="splash-streams__logo-text">{{ shop.name }}</span>
+    {%- endif -%}
+  </a>
 
   <template data-splash-streams-data>
     [
@@ -64,17 +62,20 @@
 {% stylesheet %}
   .splash-streams {
     position: relative;
+    display: grid;
+    place-items: center;
     min-height: 100svh;
     width: 100%;
     overflow: hidden;
     isolation: isolate;
     background: #000;
+    padding: 3rem 1.25rem;
   }
 
   .splash-streams__bg {
     position: absolute;
     inset: 0;
-    z-index: -1;
+    z-index: 0;
   }
 
   .splash-streams__player {
@@ -90,36 +91,24 @@
   .splash-streams__overlay {
     position: absolute;
     inset: 0;
+    z-index: 1;
     background: var(--overlay-color);
     opacity: var(--overlay-opacity);
-    pointer-events: none;
-  }
-
-  .splash-streams__center {
-    position: relative;
-    min-height: 100svh;
-    display: grid;
-    place-items: center;
-    padding: 3rem 1.25rem;
+    pointer-events: auto;
   }
 
   .splash-streams__logo {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    position: relative;
+    z-index: 2;
+    display: inline-block;
     text-decoration: none;
-    border-radius: 0.75rem;
-    padding: 0.75rem 1rem;
-    background: color-mix(in srgb, var(--overlay-color) 20%, transparent);
-    backdrop-filter: blur(2px);
-    transition: transform 120ms ease, opacity 120ms ease;
+    color: inherit;
+    pointer-events: auto;
   }
 
-  .splash-streams__logo:hover,
   .splash-streams__logo:focus-visible {
-    transform: scale(1.02);
-    opacity: 0.95;
-    outline: none;
+    outline: 2px solid #fff;
+    outline-offset: 4px;
   }
 
   .splash-streams__logo-img {
@@ -186,22 +175,20 @@
     }
 
     function buildEmbedUrl(videoId) {
-      const origin = window.location.origin;
-      const params = new URLSearchParams({
-        autoplay: '1',
-        mute: '1',
-        loop: '1',
-        playlist: videoId,
-        controls: '0',
-        showinfo: '0',
-        rel: '0',
-        iv_load_policy: '3',
-        modestbranding: '1',
-        playsinline: '1',
-        enablejsapi: '0',
-        origin: origin,
-      });
-      return 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(videoId) + '?' + params.toString();
+      const id = String(videoId).trim();
+      const q = [
+        'autoplay=1',
+        'mute=1',
+        'loop=1',
+        'playlist=' + encodeURIComponent(id),
+        'controls=0',
+        'showinfo=0',
+        'rel=0',
+        'iv_load_policy=3',
+        'modestbranding=1',
+        'playsinline=1',
+      ].join('&');
+      return 'https://www.youtube.com/embed/' + encodeURIComponent(id) + '?' + q;
     }
 
     const ids = streams
