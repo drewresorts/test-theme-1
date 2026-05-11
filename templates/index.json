@@ -9,60 +9,42 @@
  */
 {
   "sections": {
-    "main": {
-      "type": "three-boutique",
-      "settings": {
-        "featured_collection": "frontpage",
-        "max_products": 12,
-        "eyebrow": "",
-        "heading": "Welcome to the Boutique",
-        "subheading": "Walk through the gallery, inspect every piece in 3D, choose your variants, and check out without leaving the room.",
-        "cta_label": "Enter the boutique",
-        "floor_color": "#ffffff",
-        "wall_color": "#ffffff",
-        "ceiling_color": "#ffffff",
-        "accent_color": "#ffffff",
-        "floor_texture": "shopify://shop_images/concrete.png",
-        "room_radius": 9,
-        "pedestal_height": 100,
-        "quality": "auto",
-        "enable_shadows": false
-      }
-    },
-    "17784798397181ba04": {
-      "type": "_blocks",
+    "splash_streams_jYPmmR": {
+      "type": "splash-streams",
       "blocks": {
-        "ai_gen_block_25599c9_jacW8T": {
-          "type": "ai_gen_block_25599c9",
+        "stream_BbCpQH": {
+          "type": "stream",
           "settings": {
-            "video_url": "https://www.youtube.com/embed/TxS4AlWPqNQ?autoplay=1&mute=1&loop=1&playlist=TxS4AlWPqNQ&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1",
-            "section_height": 900,
-            "overlay_color": "#ffffff",
-            "overlay_opacity": 0.2,
-            "button_image": "shopify://shop_images/DUET_LOGO_SPELLOUT.png",
-            "button_link": "shopify://pages/contact",
-            "button_aria_label": "Play video",
-            "button_size": 200,
-            "border_width": 0,
-            "border_color": "#ffffff",
-            "show_icon": false,
-            "icon_size": 40,
-            "icon_color": "#ffffff",
-            "text": "",
-            "text_size": 18,
-            "text_color": "#ffffff"
-          },
-          "blocks": {}
+            "youtube_url": "https://www.youtube.com/watch?v=bY9Xyjr7nvU"
+          }
+        },
+        "stream_NqRARh": {
+          "type": "stream",
+          "settings": {
+            "youtube_url": "https://www.youtube.com/watch?v=erBoOFKTH4E"
+          }
+        },
+        "stream_cqRFbW": {
+          "type": "stream",
+          "settings": {
+            "youtube_url": "https://www.youtube.com/watch?v=erBoOFKTH4E"
+          }
         }
       },
       "block_order": [
-        "ai_gen_block_25599c9_jacW8T"
+        "stream_BbCpQH",
+        "stream_NqRARh",
+        "stream_cqRFbW"
       ],
-      "settings": {}
+      "name": "Splash streams",
+      "settings": {
+        "logo_width": 260,
+        "overlay_color": "#000000",
+        "overlay_opacity": 35
+      }
     }
   },
   "order": [
-    "main",
-    "17784798397181ba04"
+    "splash_streams_jYPmmR"
   ]
 }
