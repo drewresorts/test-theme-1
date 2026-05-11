@@ -29,8 +29,26 @@
         tabindex="-1"
       ></iframe>
     </div>
+    <div class="splash-streams__selfie-shell">
+      <video
+        class="splash-streams__selfie"
+        data-splash-streams-selfie
+        playsinline
+        muted
+        autoplay
+      ></video>
+    </div>
     <div class="splash-streams__overlay"></div>
   </div>
+
+  <button
+    type="button"
+    class="splash-streams__camera-prompt"
+    data-splash-streams-camera-prompt
+    hidden
+  >
+    Tap to use your camera
+  </button>
 
   <a class="splash-streams__logo" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
     {%- if logo_image -%}
@@ -101,6 +119,83 @@
     border: 0;
   }
 
+  .splash-streams__selfie-shell {
+    display: none;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+    background: #000;
+  }
+
+  .splash-streams__selfie {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transform: scaleX(-1);
+  }
+
+  .splash-streams__camera-prompt {
+    position: absolute;
+    bottom: max(1.25rem, env(safe-area-inset-bottom));
+    left: 50%;
+    z-index: 3;
+    transform: translateX(-50%);
+    margin: 0;
+    padding: 0.65rem 1.1rem;
+    max-width: min(92vw, 22rem);
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, #fff 35%, transparent);
+    background: color-mix(in srgb, #000 55%, transparent);
+    color: #fff;
+    font: inherit;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  .splash-streams__camera-prompt[hidden] {
+    display: none;
+  }
+
+  .splash-streams__camera-prompt:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 749px) {
+    .splash-streams:not(.splash-streams--selfie-fallback) .splash-streams__player-shell {
+      display: none;
+    }
+
+    .splash-streams:not(.splash-streams--selfie-fallback) .splash-streams__selfie-shell {
+      display: block;
+    }
+
+    .splash-streams--selfie-fallback .splash-streams__selfie-shell {
+      display: none;
+    }
+
+    .splash-streams--selfie-fallback .splash-streams__player-shell {
+      display: block;
+    }
+  }
+
+  @media (min-width: 750px) {
+    .splash-streams__selfie-shell {
+      display: none !important;
+    }
+
+    .splash-streams__camera-prompt {
+      display: none !important;
+    }
+  }
+
   .splash-streams__overlay {
     position: absolute;
     inset: 0;
@@ -137,8 +232,12 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .splash-streams__selfie-shell {
+      display: none !important;
+    }
+
     .splash-streams__player-shell {
-      display: none;
+      display: block !important;
     }
   }
 {% endstylesheet %}
@@ -149,8 +248,10 @@
     if (!root) return;
 
     const iframe = root.querySelector('[data-splash-streams-iframe]');
+    const selfieVideo = root.querySelector('[data-splash-streams-selfie]');
+    const cameraPrompt = root.querySelector('[data-splash-streams-camera-prompt]');
     const dataEl = root.querySelector('[data-splash-streams-data]');
-    if (!iframe || !dataEl) return;
+    if (!iframe || !dataEl || !selfieVideo) return;
 
     let streams = [];
     try {
@@ -159,11 +260,16 @@
       streams = [];
     }
     streams = (streams || []).filter((s) => s && typeof s.url === 'string' && s.url.trim().length > 0);
-    if (streams.length === 0) return;
+
+    const mobileMql = window.matchMedia
+      ? window.matchMedia('(max-width: 749px)')
+      : { matches: false, addEventListener: function () {}, addListener: function () {} };
+    function isMobile() {
+      return mobileMql.matches;
+    }
 
     const prefersReducedMotion =
       window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
 
     function parseYouTubeId(inputUrl) {
       const raw = (inputUrl || '').trim();
@@ -209,22 +315,110 @@
     const ids = streams
       .map((s) => parseYouTubeId(s.url))
       .filter(Boolean);
-    if (ids.length === 0) return;
+    const hasYoutube = ids.length > 0;
+    if (!hasYoutube && !isMobile()) return;
 
     let index = 0;
+
+    function stopSelfie() {
+      try {
+        const ms = selfieVideo.srcObject;
+        if (ms && ms.getTracks) {
+          ms.getTracks().forEach(function (t) {
+            t.stop();
+          });
+        }
+        selfieVideo.srcObject = null;
+      } catch (e) {
+        // ignore
+      }
+    }
+
     function switchTo(nextIndex) {
+      if (!hasYoutube) return;
+      if (isMobile() && !root.classList.contains('splash-streams--selfie-fallback')) return;
       index = (nextIndex + ids.length) % ids.length;
       const videoId = ids[index];
       const url = buildEmbedUrl(videoId);
       iframe.src = 'about:blank';
-      // Force a reload so we always land at the current live edge.
-      setTimeout(() => {
+      setTimeout(function () {
         iframe.src = url;
       }, 30);
     }
 
+    function showCameraPrompt() {
+      if (!cameraPrompt || !isMobile()) return;
+      cameraPrompt.hidden = false;
+      cameraPrompt.removeAttribute('hidden');
+    }
+
+    function hideCameraPrompt() {
+      if (!cameraPrompt) return;
+      cameraPrompt.hidden = true;
+      cameraPrompt.setAttribute('hidden', '');
+    }
+
+    function startSelfie() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        return Promise.resolve(false);
+      }
+      stopSelfie();
+      return navigator.mediaDevices
+        .getUserMedia({
+          video: { facingMode: { ideal: 'user' } },
+          audio: false,
+        })
+        .then(function (stream) {
+          selfieVideo.srcObject = stream;
+          return selfieVideo.play().then(function () {
+            root.classList.remove('splash-streams--selfie-fallback');
+            iframe.src = 'about:blank';
+            hideCameraPrompt();
+            return true;
+          });
+        })
+        .catch(function () {
+          return false;
+        });
+    }
+
+    function useYoutubeOnMobile() {
+      root.classList.add('splash-streams--selfie-fallback');
+      hideCameraPrompt();
+      stopSelfie();
+      if (hasYoutube) {
+        switchTo(index);
+      }
+    }
+
+    function syncLayout() {
+      if (isMobile()) {
+        stopSelfie();
+        root.classList.remove('splash-streams--selfie-fallback');
+        startSelfie().then(function (ok) {
+          if (!ok) {
+            if (cameraPrompt) {
+              showCameraPrompt();
+            } else {
+              useYoutubeOnMobile();
+            }
+          }
+        });
+      } else {
+        hideCameraPrompt();
+        stopSelfie();
+        root.classList.remove('splash-streams--selfie-fallback');
+        if (hasYoutube) {
+          switchTo(index);
+        } else {
+          iframe.src = 'about:blank';
+        }
+      }
+    }
+
     function onKeyDown(e) {
-      if (!e) return;
+      if (!e || !hasYoutube) return;
+      if (isMobile() && !root.classList.contains('splash-streams--selfie-fallback')) return;
       const tag = (e.target && e.target.tagName) ? String(e.target.tagName).toLowerCase() : '';
       const editable =
         tag === 'input' || tag === 'textarea' || tag === 'select' || (e.target && e.target.isContentEditable);
@@ -241,7 +435,31 @@
     }
 
     document.addEventListener('keydown', onKeyDown);
-    switchTo(0);
+
+    if (prefersReducedMotion) {
+      if (hasYoutube) {
+        switchTo(0);
+      }
+      return;
+    }
+
+    if (cameraPrompt) {
+      cameraPrompt.addEventListener('click', function () {
+        startSelfie().then(function (ok) {
+          if (!ok) {
+            useYoutubeOnMobile();
+          }
+        });
+      });
+    }
+
+    if (mobileMql.addEventListener) {
+      mobileMql.addEventListener('change', syncLayout);
+    } else if (mobileMql.addListener) {
+      mobileMql.addListener(syncLayout);
+    }
+
+    syncLayout();
   })();
 {% endjavascript %}
 
