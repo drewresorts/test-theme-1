@@ -18,15 +18,17 @@
   "
 >
   <div class="splash-streams__bg" aria-hidden="true">
-    <iframe
-      class="splash-streams__player"
-      data-splash-streams-iframe
-      title=""
-      frameborder="0"
-      allow="autoplay; encrypted-media"
-      referrerpolicy="strict-origin-when-cross-origin"
-      tabindex="-1"
-    ></iframe>
+    <div class="splash-streams__player-shell">
+      <iframe
+        class="splash-streams__player"
+        data-splash-streams-iframe
+        title=""
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        referrerpolicy="strict-origin-when-cross-origin"
+        tabindex="-1"
+      ></iframe>
+    </div>
     <div class="splash-streams__overlay"></div>
   </div>
 
@@ -78,12 +80,23 @@
     z-index: 0;
   }
 
+  /* YouTube cannot hide title/channel UI via params; crop it outside the viewport. */
+  .splash-streams__player-shell {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+  }
+
   .splash-streams__player {
     position: absolute;
-    inset: 50% auto auto 50%;
-    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 56%;
     width: max(100vw, 177.78vh);
     height: max(56.25vw, 100vh);
+    transform: translate(-50%, -50%) scale(1.32);
+    transform-origin: center center;
     pointer-events: none;
     border: 0;
   }
@@ -124,7 +137,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .splash-streams__player {
+    .splash-streams__player-shell {
       display: none;
     }
   }
@@ -187,6 +200,8 @@
         'iv_load_policy=3',
         'modestbranding=1',
         'playsinline=1',
+        'fs=0',
+        'disablekb=1',
       ].join('&');
       return 'https://www.youtube.com/embed/' + encodeURIComponent(id) + '?' + q;
     }
