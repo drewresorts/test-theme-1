@@ -925,6 +925,85 @@
 
     document.addEventListener('keydown', onKeyDown);
 
+    // Mobile swipe (bottom of the screen) switches from front camera to the
+    // configured YouTube streams and continues cycling between them.
+    let swipeStartX = 0;
+    let swipeStartY = 0;
+    let swipeStartAt = 0;
+    let swipeArmed = false;
+
+    function shouldIgnoreTouchTarget(target) {
+      if (!target || !target.closest) return false;
+      // Avoid fighting with taps on buttons/links/inputs.
+      return Boolean(
+        target.closest('button,a,input,textarea,select,label,[role="button"],[role="link"]')
+      );
+    }
+
+    function touchInBottomZone(clientY) {
+      // Use a conservative bottom region so gestures don't conflict with scrolling.
+      return clientY > window.innerHeight * 0.65;
+    }
+
+    function loadYoutubeIndex(nextIndex) {
+      if (!hasYoutube) return;
+      closeNav();
+      root.classList.add('splash-streams--selfie-fallback');
+      stopSelfie();
+
+      index = ((nextIndex % ids.length) + ids.length) % ids.length;
+      const videoId = ids[index];
+      const url = buildEmbedUrl(videoId);
+      iframe.src = 'about:blank';
+      setTimeout(function () {
+        iframe.src = url;
+      }, 30);
+    }
+
+    root.addEventListener(
+      'touchstart',
+      function (e) {
+        if (!isMobile() || !hasYoutube) return;
+        if (root.classList.contains('splash-streams--nav-open')) return;
+        if (!e.changedTouches || !e.changedTouches.length) return;
+        const t = e.changedTouches[0];
+        if (!touchInBottomZone(t.clientY)) return;
+        if (shouldIgnoreTouchTarget(e.target)) return;
+
+        swipeStartX = t.clientX;
+        swipeStartY = t.clientY;
+        swipeStartAt = Date.now();
+        swipeArmed = true;
+      },
+      { passive: true }
+    );
+
+    root.addEventListener(
+      'touchend',
+      function (e) {
+        if (!isMobile() || !hasYoutube) return;
+        if (!swipeArmed) return;
+        swipeArmed = false;
+        if (!e.changedTouches || !e.changedTouches.length) return;
+
+        const t = e.changedTouches[0];
+        const dx = t.clientX - swipeStartX;
+        const dy = t.clientY - swipeStartY;
+        const dt = Date.now() - swipeStartAt;
+
+        // Horizontal swipe with reasonable distance + speed.
+        if (dt > 900) return;
+        if (Math.abs(dx) < 60) return;
+        if (Math.abs(dx) < Math.abs(dy) * 1.1) return;
+
+        // Swipe left => next stream; swipe right => previous stream.
+        const dir = dx < 0 ? 1 : -1;
+        loadYoutubeIndex(index + dir);
+        e.preventDefault();
+      },
+      { passive: false }
+    );
+
     if (prefersReducedMotion) {
       closeNav();
       if (hasYoutube) {
