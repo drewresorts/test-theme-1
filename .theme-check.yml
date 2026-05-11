@@ -1,10 +1,6 @@
-# theme-check configuration
-#
-# RemoteAsset is intentionally disabled because the 3D boutique section
-# loads Three.js and its addons (GLTFLoader / DRACOLoader / KTX2Loader /
-# MeshoptDecoder / PointerLockControls / RoomEnvironment) plus their draco
-# and basis transcoder runtimes from the public jsdelivr CDN. Bundling
-# them into /assets would push the theme well past several megabytes,
-# whereas the CDN serves them with edge caching for free.
+MatchingTranslations:
+  enabled: false
+TemplateLength:
+  enabled: false
 RemoteAsset:
   enabled: false

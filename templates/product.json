@@ -1,0 +1,18 @@
+{
+  "sections": {
+    "main": {
+      "type": "product-live-stream",
+      "settings": {
+        "menu": "main-menu",
+        "nav_logo_width": 48,
+        "youtube_url": "https://www.youtube.com/watch?v=erBoOFKTH4E",
+        "overlay_color": "#5a7a9a",
+        "overlay_opacity": 45,
+        "accent_shop_color": "#e85d4c",
+        "size_active_bg": "#7d7268",
+        "show_live_clock": true
+      }
+    }
+  },
+  "order": ["main"]
+}
