@@ -38,10 +38,9 @@
       ],
       "name": "Splash streams",
       "settings": {
-        "logo_image": "shopify://shop_images/duet_spellout_white.png",
         "logo_width": 260,
-        "overlay_color": "#000000",
-        "overlay_opacity": 35
+        "overlay_color": "#ff3819",
+        "overlay_opacity": 10
       }
     }
   },
