@@ -272,6 +272,10 @@
       "nav_label": "Store menu",
       "menu_empty": "Select a navigation menu in the theme editor."
     },
+    "collections_live": {
+      "nav_label": "Store menu",
+      "menu_empty": "Select a navigation menu in the theme editor."
+    },
     "announcements": {
       "previous_announcement": "Previous announcement",
       "next_announcement": "Next announcement",
