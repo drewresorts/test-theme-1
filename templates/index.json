@@ -1,17 +1,28 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
       "type": "three-boutique",
       "settings": {
+        "featured_collection": "frontpage",
         "max_products": 12,
         "eyebrow": "Step inside",
         "heading": "Welcome to the Boutique",
         "subheading": "Walk through the gallery, inspect every piece in 3D, choose your variants, and check out without leaving the room.",
         "cta_label": "Enter the boutique",
-        "floor_color": "#1a1a22",
-        "wall_color": "#0e0e14",
-        "ceiling_color": "#0b0b0f",
-        "accent_color": "#f5f5f5",
+        "floor_color": "#ffffff",
+        "wall_color": "#ffffff",
+        "ceiling_color": "#ffffff",
+        "accent_color": "#ffffff",
+        "floor_texture": "shopify://shop_images/concrete.png",
         "room_radius": 9,
         "pedestal_height": 100,
         "quality": "auto",
@@ -19,5 +30,7 @@
       }
     }
   },
-  "order": ["main"]
+  "order": [
+    "main"
+  ]
 }
