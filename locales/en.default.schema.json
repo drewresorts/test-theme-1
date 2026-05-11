@@ -22,6 +22,14 @@
         "label": "Stream origin",
         "info": "Example: https://stream.your-domain.com"
       }
+    },
+    "splash_streams": {
+      "name": "Splash streams page",
+      "intro": "Logo for the Splash streams page template. Choose an image from your library (upload or select from files).",
+      "logo": {
+        "label": "Center logo",
+        "info": "Use Select image to open your library. This is not a URL field."
+      }
     }
   },
   "coming_soon": {
@@ -83,6 +91,15 @@
         "name": "Social link",
         "label": "Label",
         "url": "URL"
+      }
+    }
+  },
+  "splash_streams_page": {
+    "section": {
+      "settings": {
+        "logo_help": {
+          "content": "Set the center logo in Theme settings → Splash streams page → Center logo (image library, not a URL)."
+        }
       }
     }
   },

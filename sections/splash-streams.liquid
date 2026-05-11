@@ -1,6 +1,7 @@
 {%- liquid
-  assign logo_image = section.settings.logo_image
+  assign logo_image = settings.splash_streams_logo
   assign logo_width = section.settings.logo_width | default: 240
+  assign logo_src_width = logo_width | times: 2
   assign overlay_opacity = section.settings.overlay_opacity | default: 35
   assign overlay_color = section.settings.overlay_color | default: '#000000'
 
@@ -34,7 +35,7 @@
       {%- if logo_image -%}
         {{
           logo_image
-          | image_url: width: logo_width | times: 2
+          | image_url: width: logo_src_width
           | image_tag:
             width: logo_width,
             loading: 'eager',
@@ -249,9 +250,8 @@
   "class": "section--splash-streams",
   "settings": [
     {
-      "type": "image_picker",
-      "id": "logo_image",
-      "label": "Logo Image"
+      "type": "paragraph",
+      "content": "t:splash_streams_page.section.settings.logo_help.content"
     },
     {
       "type": "range",
