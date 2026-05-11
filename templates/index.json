@@ -28,9 +28,40 @@
         "quality": "auto",
         "enable_shadows": false
       }
+    },
+    "17784798397181ba04": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_25599c9_jacW8T": {
+          "type": "ai_gen_block_25599c9",
+          "settings": {
+            "video_url": "https://www.youtube.com/embed/TxS4AlWPqNQ?autoplay=1&mute=1&loop=1&playlist=TxS4AlWPqNQ&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1",
+            "section_height": 600,
+            "overlay_color": "#000000",
+            "overlay_opacity": 0.3,
+            "button_link": "",
+            "button_aria_label": "Play video",
+            "button_size": 120,
+            "border_width": 3,
+            "border_color": "#ffffff",
+            "show_icon": true,
+            "icon_size": 40,
+            "icon_color": "#ffffff",
+            "text": "",
+            "text_size": 18,
+            "text_color": "#ffffff"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_25599c9_jacW8T"
+      ],
+      "settings": {}
     }
   },
   "order": [
-    "main"
+    "main",
+    "17784798397181ba04"
   ]
 }
