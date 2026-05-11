@@ -1,5 +1,6 @@
 {%- liquid
   assign logo_image = settings.splash_streams_logo
+  assign menu_logo = section.settings.menu_logo
   assign logo_width = section.settings.logo_width | default: 240
   assign logo_src_width = logo_width | times: 2
   assign overlay_opacity = section.settings.overlay_opacity | default: 35
@@ -69,20 +70,54 @@
       aria-controls="SplashStreamsNav"
       aria-label="Menu"
     >
-      {%- if logo_image -%}
-        {{
-          logo_image
-          | image_url: width: logo_src_width
-          | image_tag:
-            width: logo_width,
-            loading: 'eager',
-            decoding: 'async',
-            alt: '',
-            class: 'splash-streams__logo-img'
-        }}
-      {%- else -%}
-        <span class="splash-streams__logo-text">{{ shop.name }}</span>
-      {%- endif -%}
+      <span class="splash-streams__logo-toggle-inner">
+        {%- if logo_image != blank and menu_logo != blank -%}
+          {{
+            logo_image
+            | image_url: width: logo_src_width
+            | image_tag:
+              width: logo_width,
+              loading: 'eager',
+              decoding: 'async',
+              alt: '',
+              class: 'splash-streams__logo-img splash-streams__logo-img--default'
+          }}
+          {{
+            menu_logo
+            | image_url: width: logo_src_width
+            | image_tag:
+              width: logo_width,
+              loading: 'eager',
+              decoding: 'async',
+              alt: '',
+              class: 'splash-streams__logo-img splash-streams__logo-img--menu'
+          }}
+        {%- elsif logo_image != blank -%}
+          {{
+            logo_image
+            | image_url: width: logo_src_width
+            | image_tag:
+              width: logo_width,
+              loading: 'eager',
+              decoding: 'async',
+              alt: '',
+              class: 'splash-streams__logo-img splash-streams__logo-img--default'
+          }}
+        {%- elsif menu_logo != blank -%}
+          {{
+            menu_logo
+            | image_url: width: logo_src_width
+            | image_tag:
+              width: logo_width,
+              loading: 'eager',
+              decoding: 'async',
+              alt: '',
+              class: 'splash-streams__logo-img splash-streams__logo-img--default'
+          }}
+        {%- else -%}
+          <span class="splash-streams__logo-text splash-streams__logo-text--default">{{ shop.name }}</span>
+        {%- endif -%}
+      </span>
     </button>
 
     <nav
@@ -466,6 +501,25 @@
     cursor: pointer;
   }
 
+  .splash-streams__logo-toggle-inner {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .splash-streams__logo-img--menu {
+    display: none;
+  }
+
+  .splash-streams--nav-open .splash-streams__logo-img--default {
+    display: none;
+  }
+
+  .splash-streams--nav-open .splash-streams__logo-img--menu {
+    display: block;
+  }
+
   .splash-streams--nav-open .splash-streams__logo-toggle {
     align-self: center;
     transform: scale(0.28);
@@ -486,7 +540,8 @@
     }
   }
 
-  .splash-streams--camera-live:not(.splash-streams--nav-open) .splash-streams__logo-toggle {
+  .splash-streams--camera-live:not(.splash-streams--nav-open) .splash-streams__logo-toggle .splash-streams__logo-img--default,
+  .splash-streams--camera-live:not(.splash-streams--nav-open) .splash-streams__logo-toggle .splash-streams__logo-text--default {
     animation: splash-streams-logo-blink 1s ease-in-out infinite;
   }
 
@@ -502,7 +557,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .splash-streams--camera-live:not(.splash-streams--nav-open) .splash-streams__logo-toggle {
+    .splash-streams--camera-live:not(.splash-streams--nav-open) .splash-streams__logo-toggle .splash-streams__logo-img--default,
+    .splash-streams--camera-live:not(.splash-streams--nav-open) .splash-streams__logo-toggle .splash-streams__logo-text--default {
       animation: none;
     }
   }
@@ -524,7 +580,8 @@
       width: min(86vw, calc(var(--logo-width) * 0.5));
     }
 
-    .splash-streams__logo-toggle .splash-streams__logo-text {
+    .splash-streams__logo-toggle .splash-streams__logo-text,
+    .splash-streams__logo-toggle .splash-streams__logo-text--default {
       font-size: clamp(0.625rem, 2vw, 1rem);
     }
   }
@@ -882,6 +939,12 @@
       "label": "Navigation menu",
       "default": "main-menu",
       "info": "Same links as your storefront navigation (Online Store -> Navigation). Shows top-level items and one submenu level."
+    },
+    {
+      "type": "image_picker",
+      "id": "menu_logo",
+      "label": "Menu open logo",
+      "info": "When set along with the theme logo (Theme settings → Splash streams page → Center logo), this image is shown on the button while the menu is open. Leave blank to keep the same logo when open."
     },
     {
       "type": "range",
