@@ -12,16 +12,16 @@
     "splash_streams_jYPmmR": {
       "type": "splash-streams",
       "blocks": {
-        "stream_BbCpQH": {
-          "type": "stream",
-          "settings": {
-            "youtube_url": "https://www.youtube.com/watch?v=bY9Xyjr7nvU"
-          }
-        },
         "stream_NqRARh": {
           "type": "stream",
           "settings": {
             "youtube_url": "https://www.youtube.com/watch?v=erBoOFKTH4E"
+          }
+        },
+        "stream_BbCpQH": {
+          "type": "stream",
+          "settings": {
+            "youtube_url": "https://www.youtube.com/watch?v=bY9Xyjr7nvU"
           }
         },
         "stream_cqRFbW": {
@@ -32,8 +32,8 @@
         }
       },
       "block_order": [
-        "stream_BbCpQH",
         "stream_NqRARh",
+        "stream_BbCpQH",
         "stream_cqRFbW"
       ],
       "name": "Splash streams",
