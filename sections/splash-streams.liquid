@@ -6,6 +6,7 @@
   assign overlay_color = section.settings.overlay_color | default: '#000000'
 
   assign stream_blocks = section.blocks | where: 'type', 'stream'
+  assign splash_menu = section.settings.menu
 -%}
 
 <section
@@ -50,28 +51,7 @@
     Tap to use your camera
   </button>
 
-  <a
-    class="splash-streams__logo splash-streams__logo--desktop-only"
-    href="{{ routes.root_url }}"
-    aria-label="{{ shop.name | escape }}"
-  >
-    {%- if logo_image -%}
-      {{
-        logo_image
-        | image_url: width: logo_src_width
-        | image_tag:
-          width: logo_width,
-          loading: 'eager',
-          decoding: 'async',
-          alt: shop.name,
-          class: 'splash-streams__logo-img'
-      }}
-    {%- else -%}
-      <span class="splash-streams__logo-text">{{ shop.name }}</span>
-    {%- endif -%}
-  </a>
-
-  <div class="splash-streams__mobile-shell">
+  <div class="splash-streams__chrome">
     <button
       type="button"
       class="splash-streams__nav-backdrop"
@@ -105,32 +85,66 @@
       {%- endif -%}
     </button>
 
-    <nav id="SplashStreamsNav" class="splash-streams__nav" data-splash-nav aria-label="Menu" hidden>
+    <nav
+      id="SplashStreamsNav"
+      class="splash-streams__nav"
+      data-splash-nav
+      aria-label="{% if splash_menu != blank %}{{ splash_menu.title | escape }}{% else %}Menu{% endif %}"
+      hidden
+    >
       <ul class="splash-streams__nav-list" role="list">
-        <li>
+        {%- if splash_menu != blank and splash_menu.links.size > 0 -%}
+          {%- for link in splash_menu.links -%}
+            <li class="splash-streams__nav-item{% if link.links != blank %} splash-streams__nav-item--has-children{% endif %}">
+              <a href="{{ link.url }}" class="splash-streams__nav-link">{{ link.title | escape }}</a>
+              {%- if link.links != blank -%}
+                <ul class="splash-streams__nav-sublist" role="list">
+                  {%- for child in link.links -%}
+                    <li>
+                      <a href="{{ child.url }}" class="splash-streams__nav-link splash-streams__nav-link--sub">
+                        {{- child.title | escape -}}
+                      </a>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        {%- else -%}
+          <li class="splash-streams__nav-item splash-streams__nav-item--empty">
+            <span class="splash-streams__nav-empty">Select a navigation menu in the theme editor for this section.</span>
+          </li>
+        {%- endif -%}
+
+        {%- if stream_blocks.size > 0 -%}
+          <li class="splash-streams__nav-divider" aria-hidden="true"></li>
+          {%- assign stream_idx = 0 -%}
+          {%- for block in stream_blocks -%}
+            <li {{ block.shopify_attributes }}>
+              <button
+                type="button"
+                class="splash-streams__nav-action"
+                data-splash-pick-stream="{{ stream_idx }}"
+              >
+                Live stream {{ stream_idx | plus: 1 }}
+              </button>
+            </li>
+            {%- assign stream_idx = stream_idx | plus: 1 -%}
+          {%- endfor -%}
+        {%- endif -%}
+
+        <li class="splash-streams__nav-item splash-streams__nav-item--mobile-only">
           <button type="button" class="splash-streams__nav-action" data-splash-menu-camera>
             Front camera
           </button>
         </li>
-        {%- assign stream_idx = 0 -%}
-        {%- for block in stream_blocks -%}
-          <li {{ block.shopify_attributes }}>
-            <button
-              type="button"
-              class="splash-streams__nav-action"
-              data-splash-pick-stream="{{ stream_idx }}"
-            >
-              Live stream {{ stream_idx | plus: 1 }}
-            </button>
-          </li>
-          {%- assign stream_idx = stream_idx | plus: 1 -%}
-        {%- endfor -%}
-        <li>
-          <a class="splash-streams__nav-link" href="{{ routes.root_url }}">{{ shop.name }}</a>
-        </li>
       </ul>
     </nav>
   </div>
+
+  {%- if stream_blocks.size > 0 -%}
+    <p class="splash-streams__key-hint" aria-live="polite">Change stream with arrow keys</p>
+  {%- endif -%}
 
   <template data-splash-streams-data>
     [
@@ -270,28 +284,8 @@
     pointer-events: auto;
   }
 
-  .splash-streams__logo--desktop-only {
-    position: relative;
-    z-index: 2;
-    display: none;
-    text-decoration: none;
-    color: inherit;
-    pointer-events: auto;
-  }
-
-  @media (min-width: 750px) {
-    .splash-streams__logo--desktop-only {
-      display: inline-block;
-    }
-  }
-
-  .splash-streams__logo--desktop-only:focus-visible {
-    outline: 2px solid #fff;
-    outline-offset: 4px;
-  }
-
-  .splash-streams__mobile-shell {
-    display: none;
+  .splash-streams__chrome {
+    display: flex;
     position: relative;
     z-index: 2;
     grid-column: 1;
@@ -303,17 +297,11 @@
     pointer-events: none;
   }
 
-  @media (max-width: 749px) {
-    .splash-streams__mobile-shell {
-      display: flex;
-    }
-  }
-
-  .splash-streams__mobile-shell > * {
+  .splash-streams__chrome > * {
     pointer-events: auto;
   }
 
-  .splash-streams--nav-open .splash-streams__mobile-shell {
+  .splash-streams--nav-open .splash-streams__chrome {
     position: fixed;
     inset: 0;
     z-index: 20;
@@ -394,10 +382,45 @@
     cursor: pointer;
   }
 
-  .splash-streams__nav-link {
-    border-top: 1px solid color-mix(in srgb, #fff 25%, transparent);
-    margin-top: 0.35rem;
-    padding-top: 0.75rem;
+  .splash-streams__nav-link--sub {
+    font-size: 0.88rem;
+    font-weight: 400;
+    padding-left: 0.5rem;
+  }
+
+  .splash-streams__nav-sublist {
+    list-style: none;
+    margin: 0.25rem 0 0;
+    padding: 0 0 0 0.5rem;
+    border-left: 1px solid color-mix(in srgb, #fff 22%, transparent);
+  }
+
+  .splash-streams__nav-divider {
+    align-self: stretch;
+    height: 1px;
+    margin: 0.5rem 0;
+    padding: 0;
+    list-style: none;
+    background: color-mix(in srgb, #fff 22%, transparent);
+    border: 0;
+  }
+
+  .splash-streams__nav-empty {
+    display: block;
+    margin: 0;
+    padding: 0.35rem 0;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: color-mix(in srgb, #fff 80%, transparent);
+    text-shadow:
+      0 0 6px #000,
+      0 1px 2px #000;
+  }
+
+  @media (min-width: 750px) {
+    .splash-streams__nav-item--mobile-only {
+      display: none !important;
+    }
   }
 
   .splash-streams__nav-action:focus-visible,
@@ -468,6 +491,38 @@
     .splash-streams__logo-toggle .splash-streams__logo-text {
       font-size: clamp(0.625rem, 2vw, 1rem);
     }
+  }
+
+  .splash-streams__key-hint {
+    display: none;
+    position: absolute;
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    left: 50%;
+    z-index: 4;
+    transform: translateX(-50%);
+    margin: 0;
+    max-width: min(92vw, 28rem);
+    padding: 0 0.5rem;
+    text-align: center;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, #fff 72%, transparent);
+    text-shadow:
+      0 0 8px #000,
+      0 1px 2px #000;
+    pointer-events: none;
+  }
+
+  @media (min-width: 750px) {
+    .splash-streams__key-hint {
+      display: block;
+    }
+  }
+
+  .splash-streams--nav-open .splash-streams__key-hint {
+    opacity: 0;
+    transition: opacity 0.15s ease;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -558,7 +613,6 @@
       .map((s) => parseYouTubeId(s.url))
       .filter(Boolean);
     const hasYoutube = ids.length > 0;
-    if (!hasYoutube && !isMobile()) return;
 
     let index = 0;
 
@@ -577,7 +631,6 @@
     }
 
     function openNav() {
-      if (!isMobile()) return;
       root.classList.add('splash-streams--nav-open');
       if (backdrop) {
         backdrop.removeAttribute('hidden');
@@ -592,7 +645,6 @@
     }
 
     function toggleNav() {
-      if (!isMobile()) return;
       if (root.classList.contains('splash-streams--nav-open')) {
         closeNav();
       } else {
@@ -605,9 +657,11 @@
       const n = parseInt(i, 10);
       if (Number.isNaN(n)) return;
       closeNav();
-      root.classList.add('splash-streams--selfie-fallback');
-      stopSelfie();
       index = ((n % ids.length) + ids.length) % ids.length;
+      if (isMobile()) {
+        root.classList.add('splash-streams--selfie-fallback');
+        stopSelfie();
+      }
       const videoId = ids[index];
       const url = buildEmbedUrl(videoId);
       iframe.src = 'about:blank';
@@ -735,7 +789,7 @@
 
     function onKeyDown(e) {
       if (!e) return;
-      if (e.key === 'Escape' && isMobile() && root.classList.contains('splash-streams--nav-open')) {
+      if (e.key === 'Escape' && root.classList.contains('splash-streams--nav-open')) {
         e.preventDefault();
         closeNav();
         return;
@@ -769,7 +823,6 @@
 
     if (logoToggle) {
       logoToggle.addEventListener('click', function (e) {
-        if (!isMobile()) return;
         e.stopPropagation();
         toggleNav();
       });
@@ -782,12 +835,13 @@
     }
 
     root.addEventListener('click', function (e) {
-      if (!isMobile()) return;
-      const camBtn = e.target.closest('[data-splash-menu-camera]');
-      if (camBtn) {
-        e.preventDefault();
-        onMenuCamera();
-        return;
+      if (isMobile()) {
+        const camBtn = e.target.closest('[data-splash-menu-camera]');
+        if (camBtn) {
+          e.preventDefault();
+          onMenuCamera();
+          return;
+        }
       }
       const pickBtn = e.target.closest('[data-splash-pick-stream]');
       if (pickBtn && pickBtn.dataset.splashPickStream != null) {
@@ -796,11 +850,14 @@
       }
     });
 
-    root.querySelectorAll('.splash-streams__nav-link').forEach(function (a) {
-      a.addEventListener('click', function () {
-        closeNav();
+    if (navEl) {
+      navEl.addEventListener('click', function (e) {
+        const anchor = e.target.closest('a[href]');
+        if (anchor && navEl.contains(anchor)) {
+          closeNav();
+        }
       });
-    });
+    }
 
     if (cameraPrompt) {
       cameraPrompt.addEventListener('click', function () {
@@ -831,6 +888,13 @@
     {
       "type": "paragraph",
       "content": "t:splash_streams_page.section.settings.logo_help.content"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Navigation menu",
+      "default": "main-menu",
+      "info": "Same menu as your storefront (Online Store -> Navigation). Top-level links and one level of dropdowns are shown."
     },
     {
       "type": "range",

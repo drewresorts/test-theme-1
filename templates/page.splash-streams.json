@@ -2,6 +2,9 @@
   "sections": {
     "main": {
       "type": "splash-streams",
+      "settings": {
+        "menu": "main-menu"
+      },
       "blocks": {
         "stream-1": {
           "type": "stream",
