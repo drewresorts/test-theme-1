@@ -11,7 +11,7 @@
   "current": {
     "background_color": "#0b0b0f",
     "text_color": "#ffffff",
-    "body_font": "assistant_n4",
+    "body_font": "sans_serif_n4",
     "stream_origin": "https://www.youtube.com/watch?v=TxS4AlWPqNQ",
     "content_for_index": []
   },
