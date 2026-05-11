@@ -187,5 +187,37 @@
         "default": "3D boutique"
       }
     }
+  },
+  "product_splash": {
+    "section": {
+      "name": "Full-bleed product page",
+      "settings": {
+        "intro": "Full-viewport product layout: background image, left navigation, hero product image, and right-side buy box. Assign a menu for the left column (first link uses the red accent).",
+        "background_image": {
+          "label": "Background image"
+        },
+        "overlay_color": {
+          "label": "Background tint color"
+        },
+        "overlay_opacity": {
+          "label": "Background tint strength"
+        },
+        "accent_shop_color": {
+          "label": "First nav link color"
+        },
+        "accent_select_color": {
+          "label": "Selected option color"
+        },
+        "logo_mark": {
+          "label": "Top-left mark (text)"
+        },
+        "side_menu": {
+          "label": "Left column menu"
+        },
+        "nav_aria_label": {
+          "label": "Left menu (accessibility label)"
+        }
+      }
+    }
   }
 }
