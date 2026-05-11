@@ -115,29 +115,6 @@
             <span class="splash-streams__nav-empty">Select a navigation menu in the theme editor for this section.</span>
           </li>
         {%- endif -%}
-
-        {%- if stream_blocks.size > 0 -%}
-          <li class="splash-streams__nav-divider" aria-hidden="true"></li>
-          {%- assign stream_idx = 0 -%}
-          {%- for block in stream_blocks -%}
-            <li {{ block.shopify_attributes }}>
-              <button
-                type="button"
-                class="splash-streams__nav-action"
-                data-splash-pick-stream="{{ stream_idx }}"
-              >
-                Live stream {{ stream_idx | plus: 1 }}
-              </button>
-            </li>
-            {%- assign stream_idx = stream_idx | plus: 1 -%}
-          {%- endfor -%}
-        {%- endif -%}
-
-        <li class="splash-streams__nav-item splash-streams__nav-item--mobile-only">
-          <button type="button" class="splash-streams__nav-action" data-splash-menu-camera>
-            Front camera
-          </button>
-        </li>
       </ul>
     </nav>
   </div>
@@ -362,7 +339,6 @@
     gap: 0.35rem;
   }
 
-  .splash-streams__nav-action,
   .splash-streams__nav-link {
     display: block;
     width: 100%;
@@ -395,16 +371,6 @@
     border-left: 1px solid color-mix(in srgb, #fff 22%, transparent);
   }
 
-  .splash-streams__nav-divider {
-    align-self: stretch;
-    height: 1px;
-    margin: 0.5rem 0;
-    padding: 0;
-    list-style: none;
-    background: color-mix(in srgb, #fff 22%, transparent);
-    border: 0;
-  }
-
   .splash-streams__nav-empty {
     display: block;
     margin: 0;
@@ -417,13 +383,6 @@
       0 1px 2px #000;
   }
 
-  @media (min-width: 750px) {
-    .splash-streams__nav-item--mobile-only {
-      display: none !important;
-    }
-  }
-
-  .splash-streams__nav-action:focus-visible,
   .splash-streams__nav-link:focus-visible,
   .splash-streams__logo-toggle:focus-visible {
     outline: 2px solid #fff;
@@ -652,39 +611,6 @@
       }
     }
 
-    function goToYoutubeStream(i) {
-      if (!hasYoutube) return;
-      const n = parseInt(i, 10);
-      if (Number.isNaN(n)) return;
-      closeNav();
-      index = ((n % ids.length) + ids.length) % ids.length;
-      if (isMobile()) {
-        root.classList.add('splash-streams--selfie-fallback');
-        stopSelfie();
-      }
-      const videoId = ids[index];
-      const url = buildEmbedUrl(videoId);
-      iframe.src = 'about:blank';
-      setTimeout(function () {
-        iframe.src = url;
-      }, 30);
-    }
-
-    function onMenuCamera() {
-      if (!isMobile()) return;
-      closeNav();
-      root.classList.remove('splash-streams--selfie-fallback');
-      startSelfie().then(function (ok) {
-        if (!ok) {
-          if (cameraPrompt) {
-            showCameraPrompt();
-          } else {
-            useYoutubeOnMobile();
-          }
-        }
-      });
-    }
-
     function stopSelfie() {
       root.classList.remove('splash-streams--camera-live');
       try {
@@ -834,22 +760,6 @@
       });
     }
 
-    root.addEventListener('click', function (e) {
-      if (isMobile()) {
-        const camBtn = e.target.closest('[data-splash-menu-camera]');
-        if (camBtn) {
-          e.preventDefault();
-          onMenuCamera();
-          return;
-        }
-      }
-      const pickBtn = e.target.closest('[data-splash-pick-stream]');
-      if (pickBtn && pickBtn.dataset.splashPickStream != null) {
-        e.preventDefault();
-        goToYoutubeStream(pickBtn.dataset.splashPickStream);
-      }
-    });
-
     if (navEl) {
       navEl.addEventListener('click', function (e) {
         const anchor = e.target.closest('a[href]');
@@ -894,7 +804,7 @@
       "id": "menu",
       "label": "Navigation menu",
       "default": "main-menu",
-      "info": "Same menu as your storefront (Online Store -> Navigation). Top-level links and one level of dropdowns are shown."
+      "info": "Same links as your storefront navigation (Online Store -> Navigation). Shows top-level items and one submenu level."
     },
     {
       "type": "range",
