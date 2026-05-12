@@ -128,8 +128,8 @@
     "splash_global_logo_width": 220,
     "splash_global_overlay_color": "#000000",
     "splash_global_overlay_opacity": 35,
-    "splash_global_on_product": false,
-    "splash_global_on_list_collections": false,
+    "splash_global_on_product": true,
+    "splash_global_on_list_collections": true,
     "splash_global_show_key_hint": true,
     "sections": {
       "main-password-header": {

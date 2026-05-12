@@ -12,6 +12,11 @@
   assign logo_src_width = logo_width | times: 2
   assign stream_blocks = section.blocks | where: 'type', 'stream'
   assign primary_stream = section.settings.youtube_url | strip
+
+  assign pls_use_site_stream = false
+  if settings.splash_global_enabled and settings.splash_global_on_product
+    assign pls_use_site_stream = true
+  endif
 -%}
 
 {%- if product == blank -%}
@@ -20,7 +25,7 @@
   </div>
 {%- else -%}
   <section
-    class="product-live-stream"
+    class="product-live-stream{% if pls_use_site_stream %} product-live-stream--site-stream{% endif %}"
     data-product-live-stream
     id="ProductLive-{{ section.id }}"
     style="
@@ -30,20 +35,22 @@
       --pls-size-active: {{ size_active }};
     "
   >
-    <div class="product-live-stream__bg" aria-hidden="true">
-      <div class="product-live-stream__player-shell">
-        <iframe
-          class="product-live-stream__player"
-          data-pls-iframe
-          title=""
-          frameborder="0"
-          allow="autoplay; encrypted-media"
-          referrerpolicy="strict-origin-when-cross-origin"
-          tabindex="-1"
-        ></iframe>
+    {%- unless pls_use_site_stream -%}
+      <div class="product-live-stream__bg" aria-hidden="true">
+        <div class="product-live-stream__player-shell">
+          <iframe
+            class="product-live-stream__player"
+            data-pls-iframe
+            title=""
+            frameborder="0"
+            allow="autoplay; encrypted-media"
+            referrerpolicy="strict-origin-when-cross-origin"
+            tabindex="-1"
+          ></iframe>
+        </div>
+        <div class="product-live-stream__overlay"></div>
       </div>
-      <div class="product-live-stream__overlay"></div>
-    </div>
+    {%- endunless -%}
 
     {%- if section.settings.show_live_clock -%}
       <div class="product-live-stream__corner" aria-hidden="true">
@@ -258,6 +265,10 @@
       background: #0a0a0c;
       color: #fff;
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .product-live-stream--site-stream {
+      background: transparent;
     }
 
     .product-live-stream__bg {

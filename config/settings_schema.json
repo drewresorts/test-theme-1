@@ -1545,14 +1545,14 @@
         "id": "splash_global_on_product",
         "label": "t:settings_schema.splash_global.on_product.label",
         "info": "t:settings_schema.splash_global.on_product.info",
-        "default": false
+        "default": true
       },
       {
         "type": "checkbox",
         "id": "splash_global_on_list_collections",
         "label": "t:settings_schema.splash_global.on_list_collections.label",
         "info": "t:settings_schema.splash_global.on_list_collections.info",
-        "default": false
+        "default": true
       },
       {
         "type": "checkbox",

@@ -516,3 +516,34 @@ body.splash-global--nav-open .global-splash__key-hint {
     display: block !important;
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/* Storefront cards & section bands: 50% transparent over the live backdrop   */
+/* -------------------------------------------------------------------------- */
+
+body.splash-global--active #MainContent .card--card,
+body.splash-global--active #MainContent .card--standard .card__inner {
+  background: rgba(var(--color-background), 0.5) !important;
+  --gradient-background: rgba(var(--color-background), 0.5);
+}
+
+body.splash-global--active #MainContent .multicolumn:not(.background-none) .multicolumn-card,
+body.splash-global--active #MainContent .multicolumn.background-primary .multicolumn-card {
+  background: rgba(var(--color-background), 0.5) !important;
+}
+
+body.splash-global--active #MainContent .collage-card.gradient {
+  background: rgba(var(--color-background), 0.5) !important;
+  --gradient-background: rgba(var(--color-background), 0.5);
+}
+
+body.splash-global--active #MainContent .shopify-section > .gradient {
+  background: rgba(var(--color-background), 0.5) !important;
+  --gradient-background: rgba(var(--color-background), 0.5);
+}
+
+body.splash-global--active .product-live-stream__nav-panel,
+body.splash-global--active .product-live-stream__media-frame,
+body.splash-global--active .collections-live__nav-panel {
+  background: rgba(0, 0, 0, 0.5) !important;
+}

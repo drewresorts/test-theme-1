@@ -380,7 +380,7 @@
     },
     "splash_global": {
       "name": "Site-wide splash backdrop",
-      "intro": "Shows the same muted live YouTube background and logo menu (Roboto, centered nav) on most storefront pages. Skips the home page and Splash streams page to avoid duplicate players. Turn on for product or collections list only if those templates do not already use a full-page stream.",
+      "intro": "Shows the same muted live YouTube background and logo menu (Roboto, centered nav) on most storefront pages. Skips the home page and Splash streams page to avoid duplicate players. Product and collections list pages use this same feed when enabled; the live-stream product and collections list sections hide their own video layer so only one player runs.",
       "enabled": {
         "label": "Enable site-wide live backdrop and menu"
       },
@@ -406,11 +406,11 @@
       },
       "on_product": {
         "label": "Show on product pages",
-        "info": "Off by default when your product template already fills the screen with a stream."
+        "info": "Recommended on: one shared live backdrop; the Live stream product section skips its own iframe when this is on."
       },
       "on_list_collections": {
         "label": "Show on collections list page",
-        "info": "Off by default when that template already includes a full-page stream."
+        "info": "Recommended on: one shared live backdrop; the Live stream collections section skips its own iframe when this is on."
       },
       "show_key_hint": {
         "label": "Show stream keyboard hint",

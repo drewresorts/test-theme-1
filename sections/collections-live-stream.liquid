@@ -27,6 +27,11 @@
     assign sorted_collections = sorted_collections | reverse
   endif
 
+  assign cls_use_site_stream = false
+  if settings.splash_global_enabled and settings.splash_global_on_list_collections
+    assign cls_use_site_stream = true
+  endif
+
   assign modulo_result = 28 | modulo: section.settings.columns_desktop
   assign paginate_by = 30
   if modulo_result == 0
@@ -35,7 +40,7 @@
 -%}
 
 <section
-  class="collections-live"
+  class="collections-live{% if cls_use_site_stream %} collections-live--site-stream{% endif %}"
   data-collections-live
   id="CollectionsLive-{{ section.id }}"
   style="
@@ -45,20 +50,22 @@
     --cls-rail-title: {{ rail_color }};
   "
 >
-  <div class="collections-live__bg" aria-hidden="true">
-    <div class="collections-live__player-shell">
-      <iframe
-        class="collections-live__player"
-        data-cls-iframe
-        title=""
-        frameborder="0"
-        allow="autoplay; encrypted-media"
-        referrerpolicy="strict-origin-when-cross-origin"
-        tabindex="-1"
-      ></iframe>
+  {%- unless cls_use_site_stream -%}
+    <div class="collections-live__bg" aria-hidden="true">
+      <div class="collections-live__player-shell">
+        <iframe
+          class="collections-live__player"
+          data-cls-iframe
+          title=""
+          frameborder="0"
+          allow="autoplay; encrypted-media"
+          referrerpolicy="strict-origin-when-cross-origin"
+          tabindex="-1"
+        ></iframe>
+      </div>
+      <div class="collections-live__overlay"></div>
     </div>
-    <div class="collections-live__overlay"></div>
-  </div>
+  {%- endunless -%}
 
   {%- if section.settings.show_live_clock -%}
     <div class="collections-live__corner" aria-hidden="true">
@@ -201,6 +208,10 @@
     background: #0a0a0c;
     color: #fff;
     font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  .collections-live--site-stream {
+    background: transparent;
   }
 
   .collections-live__visually-hidden {
