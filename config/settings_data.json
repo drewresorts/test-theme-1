@@ -121,6 +121,16 @@
     "show_cart_note": false,
     "cart_drawer_collection": "",
     "splash_streams_logo": "shopify://shop_images/duet_circle_logo_46a3a8f9-f5fb-4787-ab9b-dd9cdda86de4.png",
+    "splash_global_enabled": true,
+    "splash_global_youtube_urls": "https://www.youtube.com/watch?v=erBoOFKTH4E\nhttps://www.youtube.com/watch?v=bY9Xyjr7nvU",
+    "splash_global_menu": "main-menu",
+    "splash_global_menu_logo": "",
+    "splash_global_logo_width": 220,
+    "splash_global_overlay_color": "#000000",
+    "splash_global_overlay_opacity": 35,
+    "splash_global_on_product": false,
+    "splash_global_on_list_collections": false,
+    "splash_global_show_key_hint": true,
     "sections": {
       "main-password-header": {
         "type": "main-password-header",

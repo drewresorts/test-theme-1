@@ -292,6 +292,14 @@
       "nav_label": "Store menu",
       "menu_empty": "Select a navigation menu in the theme editor."
     },
+    "global_splash": {
+      "camera_prompt": "Tap to use your camera",
+      "open_menu": "Menu",
+      "close_menu": "Close menu",
+      "nav_fallback": "Menu",
+      "menu_empty": "Select a navigation menu in Theme settings → Site-wide splash backdrop.",
+      "key_hint": "Change stream with arrow keys"
+    },
     "header": {
       "announcement": "Announcement",
       "menu": "Menu",

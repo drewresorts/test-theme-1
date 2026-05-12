@@ -377,6 +377,45 @@
         "label": "Center logo",
         "info": "Use Select image to open your library. This is not a URL field."
       }
+    },
+    "splash_global": {
+      "name": "Site-wide splash backdrop",
+      "intro": "Shows the same muted live YouTube background and logo menu (Roboto, centered nav) on most storefront pages. Skips the home page and Splash streams page to avoid duplicate players. Turn on for product or collections list only if those templates do not already use a full-page stream.",
+      "enabled": {
+        "label": "Enable site-wide live backdrop and menu"
+      },
+      "youtube_urls": {
+        "label": "YouTube stream URLs",
+        "info": "One watch or embed URL per line. Streams cycle with left/right arrow keys on desktop, or swipe horizontally along the bottom edge on mobile when YouTube is active."
+      },
+      "menu": {
+        "label": "Navigation menu"
+      },
+      "menu_logo": {
+        "label": "Menu-open logo",
+        "info": "Optional alternate image on the menu button while the menu is open. Uses the Splash streams center logo when closed."
+      },
+      "logo_width": {
+        "label": "Logo width"
+      },
+      "overlay_color": {
+        "label": "Overlay color"
+      },
+      "overlay_opacity": {
+        "label": "Overlay opacity"
+      },
+      "on_product": {
+        "label": "Show on product pages",
+        "info": "Off by default when your product template already fills the screen with a stream."
+      },
+      "on_list_collections": {
+        "label": "Show on collections list page",
+        "info": "Off by default when that template already includes a full-page stream."
+      },
+      "show_key_hint": {
+        "label": "Show stream keyboard hint",
+        "info": "Small hint at the bottom on desktop when more than one stream URL is set."
+      }
     }
   },
   "sections": {

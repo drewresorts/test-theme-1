@@ -1,0 +1,185 @@
+{%- liquid
+  assign logo_image = settings.splash_streams_logo
+  assign menu_logo = settings.splash_global_menu_logo
+  assign logo_width = settings.splash_global_logo_width | default: 220
+  assign logo_src_width = logo_width | times: 2
+  assign overlay_opacity = settings.splash_global_overlay_opacity | default: 35
+  assign overlay_color = settings.splash_global_overlay_color | default: '#000000'
+  assign splash_menu = settings.splash_global_menu
+
+  assign url_lines = settings.splash_global_youtube_urls | default: '' | strip | newline_to_br | split: '<br />'
+  assign stream_count = 0
+  for line in url_lines
+    assign u = line | strip | replace: '<br />', '' | strip
+    if u != ''
+      assign stream_count = stream_count | plus: 1
+    endif
+  endfor
+-%}
+
+<div
+  class="global-splash"
+  data-global-splash-root
+  data-i18n-open-menu="{{ 'sections.global_splash.open_menu' | t | escape }}"
+  data-i18n-close-menu="{{ 'sections.global_splash.close_menu' | t | escape }}"
+  style="
+    --overlay-color: {{ overlay_color }};
+    --overlay-opacity: {{ overlay_opacity | divided_by: 100.0 }};
+    --logo-width: {{ logo_width }}px;
+  "
+>
+  <div class="global-splash__bg" aria-hidden="true">
+    <div class="global-splash__player-shell">
+      <iframe
+        class="global-splash__player"
+        data-global-iframe
+        title=""
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        referrerpolicy="strict-origin-when-cross-origin"
+        tabindex="-1"
+      ></iframe>
+    </div>
+    <div class="global-splash__selfie-shell">
+      <video
+        class="global-splash__selfie"
+        data-global-selfie
+        playsinline
+        muted
+        autoplay
+      ></video>
+    </div>
+    <div class="global-splash__overlay"></div>
+  </div>
+
+  <button
+    type="button"
+    class="global-splash__camera-prompt"
+    data-global-camera-prompt
+    hidden
+  >
+    {{ 'sections.global_splash.camera_prompt' | t }}
+  </button>
+
+  <div class="global-splash__chrome">
+    <button
+      type="button"
+      class="global-splash__nav-backdrop"
+      data-global-nav-backdrop
+      tabindex="-1"
+      aria-hidden="true"
+      hidden
+    ></button>
+
+    <div class="global-splash__nav-cluster" data-global-nav-cluster>
+      <button
+        type="button"
+        class="global-splash__logo-toggle"
+        data-global-logo-toggle
+        aria-expanded="false"
+        aria-controls="GlobalSplashNav"
+        aria-label="{{ 'sections.global_splash.open_menu' | t }}"
+      >
+        <span class="global-splash__logo-toggle-inner">
+          {%- if logo_image != blank and menu_logo != blank -%}
+            {{
+              logo_image
+              | image_url: width: logo_src_width
+              | image_tag:
+                width: logo_width,
+                loading: 'eager',
+                decoding: 'async',
+                alt: '',
+                class: 'global-splash__logo-img global-splash__logo-img--default'
+            }}
+            {{
+              menu_logo
+              | image_url: width: logo_src_width
+              | image_tag:
+                width: logo_width,
+                loading: 'eager',
+                decoding: 'async',
+                alt: '',
+                class: 'global-splash__logo-img global-splash__logo-img--menu'
+            }}
+          {%- elsif logo_image != blank -%}
+            {{
+              logo_image
+              | image_url: width: logo_src_width
+              | image_tag:
+                width: logo_width,
+                loading: 'eager',
+                decoding: 'async',
+                alt: '',
+                class: 'global-splash__logo-img global-splash__logo-img--default'
+            }}
+          {%- elsif menu_logo != blank -%}
+            {{
+              menu_logo
+              | image_url: width: logo_src_width
+              | image_tag:
+                width: logo_width,
+                loading: 'eager',
+                decoding: 'async',
+                alt: '',
+                class: 'global-splash__logo-img global-splash__logo-img--default'
+            }}
+          {%- else -%}
+            <span class="global-splash__logo-text global-splash__logo-text--default">{{ shop.name }}</span>
+          {%- endif -%}
+        </span>
+      </button>
+
+      <nav
+        id="GlobalSplashNav"
+        class="global-splash__nav"
+        data-global-nav
+        aria-label="{% if splash_menu != blank %}{{ splash_menu.title | escape }}{% else %}{{ 'sections.global_splash.nav_fallback' | t }}{% endif %}"
+        hidden
+      >
+        <ul class="global-splash__nav-list" role="list">
+          {%- if splash_menu != blank and splash_menu.links.size > 0 -%}
+            {%- for link in splash_menu.links -%}
+              <li class="global-splash__nav-item{% if link.links != blank %} global-splash__nav-item--has-children{% endif %}">
+                <a href="{{ link.url }}" class="global-splash__nav-link">{{ link.title | escape }}</a>
+                {%- if link.links != blank -%}
+                  <ul class="global-splash__nav-sublist" role="list">
+                    {%- for child in link.links -%}
+                      <li>
+                        <a href="{{ child.url }}" class="global-splash__nav-link global-splash__nav-link--sub">
+                          {{- child.title | escape -}}
+                        </a>
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+          {%- else -%}
+            <li class="global-splash__nav-item global-splash__nav-item--empty">
+              <span class="global-splash__nav-empty">{{ 'sections.global_splash.menu_empty' | t }}</span>
+            </li>
+          {%- endif -%}
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  {%- if settings.splash_global_show_key_hint and stream_count > 1 -%}
+    <p class="global-splash__key-hint" aria-live="polite">{{ 'sections.global_splash.key_hint' | t }}</p>
+  {%- endif -%}
+
+  <template data-global-splash-streams>
+    [
+      {%- assign first_stream = true -%}
+      {%- for line in url_lines -%}
+        {%- assign u = line | strip | replace: '<br />', '' | strip -%}
+        {%- if u != '' -%}
+          {%- unless first_stream -%},{%- endunless -%}
+          { "url": {{ u | json }} }
+          {%- assign first_stream = false -%}
+        {%- endif -%}
+      {%- endfor -%}
+    ]
+  </template>
+</div>

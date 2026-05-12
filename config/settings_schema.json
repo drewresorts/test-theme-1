@@ -1481,5 +1481,86 @@
         "info": "t:settings_schema.splash_streams.logo.info"
       }
     ]
+  },
+  {
+    "name": "t:settings_schema.splash_global.name",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "t:settings_schema.splash_global.intro"
+      },
+      {
+        "type": "checkbox",
+        "id": "splash_global_enabled",
+        "label": "t:settings_schema.splash_global.enabled.label",
+        "default": true
+      },
+      {
+        "type": "textarea",
+        "id": "splash_global_youtube_urls",
+        "label": "t:settings_schema.splash_global.youtube_urls.label",
+        "info": "t:settings_schema.splash_global.youtube_urls.info",
+        "default": "https://www.youtube.com/watch?v=erBoOFKTH4E\nhttps://www.youtube.com/watch?v=bY9Xyjr7nvU"
+      },
+      {
+        "type": "link_list",
+        "id": "splash_global_menu",
+        "label": "t:settings_schema.splash_global.menu.label",
+        "default": "main-menu"
+      },
+      {
+        "type": "image_picker",
+        "id": "splash_global_menu_logo",
+        "label": "t:settings_schema.splash_global.menu_logo.label",
+        "info": "t:settings_schema.splash_global.menu_logo.info"
+      },
+      {
+        "type": "range",
+        "id": "splash_global_logo_width",
+        "min": 120,
+        "max": 420,
+        "step": 10,
+        "unit": "px",
+        "label": "t:settings_schema.splash_global.logo_width.label",
+        "default": 220
+      },
+      {
+        "type": "color",
+        "id": "splash_global_overlay_color",
+        "label": "t:settings_schema.splash_global.overlay_color.label",
+        "default": "#000000"
+      },
+      {
+        "type": "range",
+        "id": "splash_global_overlay_opacity",
+        "min": 0,
+        "max": 80,
+        "step": 5,
+        "unit": "%",
+        "label": "t:settings_schema.splash_global.overlay_opacity.label",
+        "default": 35
+      },
+      {
+        "type": "checkbox",
+        "id": "splash_global_on_product",
+        "label": "t:settings_schema.splash_global.on_product.label",
+        "info": "t:settings_schema.splash_global.on_product.info",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "splash_global_on_list_collections",
+        "label": "t:settings_schema.splash_global.on_list_collections.label",
+        "info": "t:settings_schema.splash_global.on_list_collections.info",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "splash_global_show_key_hint",
+        "label": "t:settings_schema.splash_global.show_key_hint.label",
+        "info": "t:settings_schema.splash_global.show_key_hint.info",
+        "default": true
+      }
+    ]
   }
 ]

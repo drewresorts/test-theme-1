@@ -1,5 +1,20 @@
 <!doctype html>
 <html class="js" lang="{{ request.locale.iso_code }}">
+  {%- liquid
+    assign splash_global_active = false
+    if settings.splash_global_enabled
+      assign splash_global_active = true
+      if template.name == 'index'
+        assign splash_global_active = false
+      elsif template.name == 'page' and template.suffix == 'splash-streams'
+        assign splash_global_active = false
+      elsif template.name == 'product' and settings.splash_global_on_product == false
+        assign splash_global_active = false
+      elsif template.name == 'list-collections' and settings.splash_global_on_list_collections == false
+        assign splash_global_active = false
+      endif
+    endif
+  -%}
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,6 +24,11 @@
 
     {%- if settings.stream_origin != blank -%}
       <link rel="preconnect" href="{{ settings.stream_origin }}" crossorigin>
+    {%- endif -%}
+
+    {%- if splash_global_active -%}
+      <link rel="preconnect" href="https://www.youtube.com" crossorigin>
+      <link rel="preconnect" href="https://www.google.com">
     {%- endif -%}
 
     {%- if settings.favicon != blank -%}
@@ -302,10 +322,39 @@
     </script>
   </head>
 
-  <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
+  <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}{% if splash_global_active %} splash-global--active{% endif %}">
     <a class="skip-to-content-link button visually-hidden" href="#MainContent">
       {{ 'accessibility.skip_to_text' | t }}
     </a>
+
+    {%- if splash_global_active -%}
+      {%- render 'global-splash-shell' -%}
+      {{ 'global-splash-shell.css' | asset_url | stylesheet_tag }}
+      <script src="{{ 'global-splash-shell.js' | asset_url }}" defer="defer"></script>
+      {% style %}
+        body.splash-global--active {
+          background: transparent !important;
+        }
+        body.splash-global--active.gradient {
+          background: transparent !important;
+        }
+        body.splash-global--active #MainContent {
+          position: relative;
+          z-index: 2;
+        }
+        body.splash-global--active .shopify-section-header-group,
+        body.splash-global--active #shopify-section-group-header-group,
+        body.splash-global--active [id^='shopify-section-group'][id$='header'] {
+          position: relative;
+          z-index: 2;
+        }
+        body.splash-global--active .shopify-section-group-footer-group,
+        body.splash-global--active #shopify-section-group-footer-group {
+          position: relative;
+          z-index: 2;
+        }
+      {% endstyle %}
+    {%- endif -%}
 
     {%- if settings.cart_type == 'drawer' -%}
       {%- render 'cart-drawer' -%}
