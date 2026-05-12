@@ -1976,112 +1976,6 @@
         }
       }
     },
-    "collections_live": {
-      "name": "Collections live list",
-      "settings": {
-        "intro": {
-          "content": "Full-screen live YouTube background with left navigation, a grid of store collections (title above image), and a vertical title on wide screens."
-        },
-        "menu": {
-          "label": "Navigation menu"
-        },
-        "nav_logo": {
-          "label": "Logo above menu",
-          "info": "Optional. Falls back to Theme settings → Splash streams page → Center logo when set."
-        },
-        "nav_logo_width": {
-          "label": "Logo width"
-        },
-        "show_second_link_decor": {
-          "label": "Icon beside 2nd menu link"
-        },
-        "vertical_title": {
-          "label": "Vertical side title"
-        },
-        "vertical_title_color": {
-          "label": "Vertical title color"
-        },
-        "youtube_url": {
-          "label": "Background YouTube URL",
-          "info": "Watch or embed URL. Autoplay, mute, and minimal chrome are applied automatically."
-        },
-        "overlay_color": {
-          "label": "Overlay color"
-        },
-        "overlay_opacity": {
-          "label": "Overlay opacity"
-        },
-        "accent_shop_color": {
-          "label": "First menu link color"
-        },
-        "show_live_clock": {
-          "label": "Show live-style clock"
-        },
-        "sort": {
-          "label": "Collection order"
-        },
-        "columns_desktop": {
-          "label": "Columns on desktop"
-        }
-      },
-      "blocks": {
-        "stream": {
-          "name": "Extra background stream",
-          "settings": {
-            "youtube_url": {
-              "label": "YouTube URL"
-            }
-          }
-        }
-      }
-    },
-    "product_live_stream": {
-      "name": "Live stream product",
-      "settings": {
-        "intro": {
-          "content": "Full-screen live YouTube background with left navigation, centered product image, and product details. Assign this template to products in the theme editor or set it as the default product template."
-        },
-        "menu": {
-          "label": "Navigation menu"
-        },
-        "nav_logo": {
-          "label": "Logo above menu",
-          "info": "Optional. If empty, uses Theme settings → Splash streams page → Center logo when set."
-        },
-        "nav_logo_width": {
-          "label": "Logo width"
-        },
-        "youtube_url": {
-          "label": "Background YouTube URL",
-          "info": "Watch or embed URL. Autoplay, mute, and minimal chrome are applied automatically."
-        },
-        "overlay_color": {
-          "label": "Overlay color"
-        },
-        "overlay_opacity": {
-          "label": "Overlay opacity"
-        },
-        "accent_shop_color": {
-          "label": "First menu link color"
-        },
-        "size_active_bg": {
-          "label": "Selected option background"
-        },
-        "show_live_clock": {
-          "label": "Show live-style clock"
-        }
-      },
-      "blocks": {
-        "stream": {
-          "name": "Extra background stream",
-          "settings": {
-            "youtube_url": {
-              "label": "YouTube URL"
-            }
-          }
-        }
-      }
-    },
     "main-product": {
       "name": "Product information",
       "blocks": {
@@ -2428,10 +2322,6 @@
         "icon_with_text": {
           "name": "Icon with text",
           "settings": {
-            "content": {
-              "label": "Content",
-              "info": "Add icons, images, or headings for up to three pairs."
-            },
             "layout": {
               "label": "Layout",
               "options__1": {
@@ -2483,6 +2373,10 @@
             "heading_3": {
               "label": "Heading",
               "default": "Heading"
+            },
+            "content": {
+              "label": "Content",
+              "info": "Rich text shown with the icon pairings in this block."
             }
           }
         }
@@ -3560,6 +3454,112 @@
       },
       "presets": {
         "name": "Collapsible content"
+      }
+    },
+    "product_live_stream": {
+      "name": "Live stream product",
+      "settings": {
+        "intro": {
+          "content": "Full-screen live YouTube background with left navigation, centered product image, and product details. Assign this template to products in the theme editor or set it as the default product template."
+        },
+        "menu": {
+          "label": "Navigation menu"
+        },
+        "nav_logo": {
+          "label": "Logo above menu",
+          "info": "Optional. If empty, uses Theme settings → Splash streams page → Center logo when set."
+        },
+        "nav_logo_width": {
+          "label": "Logo width"
+        },
+        "youtube_url": {
+          "label": "Background YouTube URL",
+          "info": "Watch or embed URL. Autoplay, mute, and minimal chrome are applied automatically."
+        },
+        "overlay_color": {
+          "label": "Overlay color"
+        },
+        "overlay_opacity": {
+          "label": "Overlay opacity"
+        },
+        "accent_shop_color": {
+          "label": "First menu link color"
+        },
+        "size_active_bg": {
+          "label": "Selected option background"
+        },
+        "show_live_clock": {
+          "label": "Show live-style clock"
+        }
+      },
+      "blocks": {
+        "stream": {
+          "name": "Extra background stream",
+          "settings": {
+            "youtube_url": {
+              "label": "YouTube URL"
+            }
+          }
+        }
+      }
+    },
+    "collections_live": {
+      "name": "Collections live list",
+      "settings": {
+        "intro": {
+          "content": "Full-screen live YouTube background with left navigation, a grid of store collections (title above image), and a vertical title on wide screens."
+        },
+        "menu": {
+          "label": "Navigation menu"
+        },
+        "nav_logo": {
+          "label": "Logo above menu",
+          "info": "Optional. Falls back to Theme settings → Splash streams page → Center logo when set."
+        },
+        "nav_logo_width": {
+          "label": "Logo width"
+        },
+        "show_second_link_decor": {
+          "label": "Icon beside 2nd menu link"
+        },
+        "vertical_title": {
+          "label": "Vertical side title"
+        },
+        "vertical_title_color": {
+          "label": "Vertical title color"
+        },
+        "youtube_url": {
+          "label": "Background YouTube URL",
+          "info": "Watch or embed URL. Autoplay, mute, and minimal chrome are applied automatically."
+        },
+        "overlay_color": {
+          "label": "Overlay color"
+        },
+        "overlay_opacity": {
+          "label": "Overlay opacity"
+        },
+        "accent_shop_color": {
+          "label": "First menu link color"
+        },
+        "show_live_clock": {
+          "label": "Show live-style clock"
+        },
+        "sort": {
+          "label": "Collection order"
+        },
+        "columns_desktop": {
+          "label": "Columns on desktop"
+        }
+      },
+      "blocks": {
+        "stream": {
+          "name": "Extra background stream",
+          "settings": {
+            "youtube_url": {
+              "label": "YouTube URL"
+            }
+          }
+        }
       }
     }
   },
