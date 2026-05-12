@@ -18,7 +18,7 @@
 -%}
 
 <div
-  class="global-splash"
+  class="global-splash-media"
   data-global-splash-root
   data-i18n-open-menu="{{ 'sections.global_splash.open_menu' | t | escape }}"
   data-i18n-close-menu="{{ 'sections.global_splash.close_menu' | t | escape }}"
@@ -52,6 +52,22 @@
     <div class="global-splash__overlay"></div>
   </div>
 
+  <template data-global-splash-streams>
+    [
+      {%- assign first_stream = true -%}
+      {%- for line in url_lines -%}
+        {%- assign u = line | strip | replace: '<br />', '' | strip -%}
+        {%- if u != '' -%}
+          {%- unless first_stream -%},{%- endunless -%}
+          { "url": {{ u | json }} }
+          {%- assign first_stream = false -%}
+        {%- endif -%}
+      {%- endfor -%}
+    ]
+  </template>
+</div>
+
+<div class="global-splash-ui">
   <button
     type="button"
     class="global-splash__camera-prompt"
@@ -168,18 +184,4 @@
   {%- if settings.splash_global_show_key_hint and stream_count > 1 -%}
     <p class="global-splash__key-hint" aria-live="polite">{{ 'sections.global_splash.key_hint' | t }}</p>
   {%- endif -%}
-
-  <template data-global-splash-streams>
-    [
-      {%- assign first_stream = true -%}
-      {%- for line in url_lines -%}
-        {%- assign u = line | strip | replace: '<br />', '' | strip -%}
-        {%- if u != '' -%}
-          {%- unless first_stream -%},{%- endunless -%}
-          { "url": {{ u | json }} }
-          {%- assign first_stream = false -%}
-        {%- endif -%}
-      {%- endfor -%}
-    ]
-  </template>
 </div>

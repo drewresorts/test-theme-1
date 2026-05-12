@@ -2,13 +2,14 @@
   const root = document.querySelector('[data-global-splash-root]');
   if (!root) return;
 
+  const stateEl = document.body;
   const iframe = root.querySelector('[data-global-iframe]');
   const selfieVideo = root.querySelector('[data-global-selfie]');
-  const cameraPrompt = root.querySelector('[data-global-camera-prompt]');
+  const cameraPrompt = document.querySelector('[data-global-camera-prompt]');
   const dataEl = root.querySelector('[data-global-splash-streams]');
-  const logoToggle = root.querySelector('[data-global-logo-toggle]');
-  const navEl = root.querySelector('[data-global-nav]');
-  const backdrop = root.querySelector('[data-global-nav-backdrop]');
+  const logoToggle = document.querySelector('[data-global-logo-toggle]');
+  const navEl = document.querySelector('[data-global-nav]');
+  const backdrop = document.querySelector('[data-global-nav-backdrop]');
   if (!iframe || !dataEl || !selfieVideo) return;
 
   const labelOpen = root.dataset.i18nOpenMenu || 'Menu';
@@ -75,15 +76,17 @@
     return 'https://www.youtube.com/embed/' + encodeURIComponent(id) + '?' + q;
   }
 
-  const ids = streams.map(function (s) {
-    return parseYouTubeId(s.url);
-  }).filter(Boolean);
+  const ids = streams
+    .map(function (s) {
+      return parseYouTubeId(s.url);
+    })
+    .filter(Boolean);
   const hasYoutube = ids.length > 0;
 
   let index = 0;
 
   function closeNav() {
-    root.classList.remove('global-splash--nav-open');
+    stateEl.classList.remove('splash-global--nav-open');
     if (backdrop) {
       backdrop.setAttribute('hidden', '');
     }
@@ -97,7 +100,7 @@
   }
 
   function openNav() {
-    root.classList.add('global-splash--nav-open');
+    stateEl.classList.add('splash-global--nav-open');
     if (backdrop) {
       backdrop.removeAttribute('hidden');
     }
@@ -111,7 +114,7 @@
   }
 
   function toggleNav() {
-    if (root.classList.contains('global-splash--nav-open')) {
+    if (stateEl.classList.contains('splash-global--nav-open')) {
       closeNav();
     } else {
       openNav();
@@ -119,7 +122,7 @@
   }
 
   function stopSelfie() {
-    root.classList.remove('global-splash--camera-live');
+    stateEl.classList.remove('splash-global--camera-live');
     try {
       const ms = selfieVideo.srcObject;
       if (ms && ms.getTracks) {
@@ -135,7 +138,7 @@
 
   function switchTo(nextIndex) {
     if (!hasYoutube) return;
-    if (isMobile() && !root.classList.contains('global-splash--selfie-fallback')) return;
+    if (isMobile() && !stateEl.classList.contains('splash-global--selfie-fallback')) return;
     index = (nextIndex + ids.length) % ids.length;
     const videoId = ids[index];
     const url = buildEmbedUrl(videoId);
@@ -170,11 +173,11 @@
       .then(function (stream) {
         selfieVideo.srcObject = stream;
         return selfieVideo.play().then(function () {
-          root.classList.remove('global-splash--selfie-fallback');
+          stateEl.classList.remove('splash-global--selfie-fallback');
           iframe.src = 'about:blank';
           hideCameraPrompt();
           if (isMobile()) {
-            root.classList.add('global-splash--camera-live');
+            stateEl.classList.add('splash-global--camera-live');
           }
           return true;
         });
@@ -185,7 +188,7 @@
   }
 
   function useYoutubeOnMobile() {
-    root.classList.add('global-splash--selfie-fallback');
+    stateEl.classList.add('splash-global--selfie-fallback');
     hideCameraPrompt();
     stopSelfie();
     if (hasYoutube) {
@@ -197,7 +200,7 @@
     if (isMobile()) {
       closeNav();
       stopSelfie();
-      root.classList.remove('global-splash--selfie-fallback');
+      stateEl.classList.remove('splash-global--selfie-fallback');
       startSelfie().then(function (ok) {
         if (!ok) {
           if (cameraPrompt) {
@@ -211,7 +214,7 @@
       closeNav();
       hideCameraPrompt();
       stopSelfie();
-      root.classList.remove('global-splash--selfie-fallback');
+      stateEl.classList.remove('splash-global--selfie-fallback');
       if (hasYoutube) {
         switchTo(index);
       } else {
@@ -222,13 +225,13 @@
 
   function onKeyDown(e) {
     if (!e) return;
-    if (e.key === 'Escape' && root.classList.contains('global-splash--nav-open')) {
+    if (e.key === 'Escape' && stateEl.classList.contains('splash-global--nav-open')) {
       e.preventDefault();
       closeNav();
       return;
     }
     if (!hasYoutube) return;
-    if (isMobile() && !root.classList.contains('global-splash--selfie-fallback')) return;
+    if (isMobile() && !stateEl.classList.contains('splash-global--selfie-fallback')) return;
     const tag = e.target && e.target.tagName ? String(e.target.tagName).toLowerCase() : '';
     const editable =
       tag === 'input' || tag === 'textarea' || tag === 'select' || (e.target && e.target.isContentEditable);
@@ -265,7 +268,7 @@
   function loadYoutubeIndex(nextIndex) {
     if (!hasYoutube) return;
     closeNav();
-    root.classList.add('global-splash--selfie-fallback');
+    stateEl.classList.add('splash-global--selfie-fallback');
     stopSelfie();
 
     index = ((nextIndex % ids.length) + ids.length) % ids.length;
@@ -277,11 +280,11 @@
     }, 30);
   }
 
-  root.addEventListener(
+  document.addEventListener(
     'touchstart',
     function (e) {
       if (!isMobile() || !hasYoutube) return;
-      if (root.classList.contains('global-splash--nav-open')) return;
+      if (stateEl.classList.contains('splash-global--nav-open')) return;
       if (!e.changedTouches || !e.changedTouches.length) return;
       const t = e.changedTouches[0];
       if (!touchInBottomZone(t.clientY)) return;
@@ -295,7 +298,7 @@
     { passive: true }
   );
 
-  root.addEventListener(
+  document.addEventListener(
     'touchend',
     function (e) {
       if (!isMobile() || !hasYoutube) return;
