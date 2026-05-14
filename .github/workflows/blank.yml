@@ -1,4 +1,5 @@
 # .github/workflows/cla.yml
+# I've signed the CLA!
 name: Contributor License Agreement (CLA)
 
 on:
