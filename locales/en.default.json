@@ -398,7 +398,14 @@
       "title": "Account",
       "details": "Account details",
       "view_addresses": "View addresses",
-      "return": "Return to Account details"
+      "return": "Return to Account details",
+      "signed_in_as": "Signed in as",
+      "continue_shopping": "Continue shopping",
+      "nav_aria": "Account navigation",
+      "nav_overview": "Overview",
+      "help": "Help",
+      "returns": "Returns",
+      "no_default_address": "You have not set a default address yet."
     },
     "account_fallback": "Account",
     "activate_account": {

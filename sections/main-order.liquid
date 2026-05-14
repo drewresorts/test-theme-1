@@ -54,7 +54,27 @@
                 scope="row"
                 data-label="{{ 'customer.order.product' | t }}"
               >
-                <div>
+                <div class="order-details__product-cell">
+                  {%- if line_item.image != blank -%}
+                    <div class="order-details__product-thumb">
+                      {%- if line_item.url != blank -%}
+                        <a href="{{ line_item.url }}" tabindex="-1" aria-hidden="true">
+                          {{
+                            line_item.image
+                            | image_url: width: 180
+                            | image_tag: loading: 'lazy', widths: '90,180', sizes: '90px', alt: line_item.title
+                          }}
+                        </a>
+                      {%- else -%}
+                        {{
+                          line_item.image
+                          | image_url: width: 180
+                          | image_tag: loading: 'lazy', widths: '90,180', sizes: '90px', alt: line_item.title
+                        }}
+                      {%- endif -%}
+                    </div>
+                  {%- endif -%}
+                  <div class="order-details__product-body">
                   {%- if line_item.url != blank -%}
                     <a href="{{ line_item.url }}">{{ line_item.title | escape }}</a>
                   {%- else -%}
@@ -124,6 +144,7 @@
                       </span>
                     </div>
                   {%- endif -%}
+                  </div>
                 </div>
               </td>
               <td

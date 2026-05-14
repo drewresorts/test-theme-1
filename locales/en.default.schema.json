@@ -1665,7 +1665,33 @@
       }
     },
     "main-account": {
-      "name": "Account"
+      "name": "Account",
+      "settings": {
+        "header_account": {
+          "content": "Account dashboard"
+        },
+        "orders_per_page": {
+          "label": "Orders per page",
+          "info": "Used for order history pagination (5–50)."
+        },
+        "show_profile_email": {
+          "label": "Show customer email"
+        },
+        "show_continue_shopping": {
+          "label": "Show continue shopping button"
+        },
+        "header_links": {
+          "content": "Support links"
+        },
+        "help_link": {
+          "label": "Help page URL",
+          "info": "Shown in the account navigation when set (e.g. FAQ or help center)."
+        },
+        "returns_link": {
+          "label": "Returns policy URL",
+          "info": "Shown in the account navigation when set."
+        }
+      }
     },
     "main-activate-account": {
       "name": "Account activation"
