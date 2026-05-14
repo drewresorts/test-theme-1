@@ -4,6 +4,11 @@
       "skip_to_content": "Skip to content"
     }
   },
+  "catalog_splash": {
+    "nav": {
+      "placeholder": "Choose a menu in the theme editor (left column links)."
+    }
+  },
   "product_splash": {
     "add_to_cart": "Add To Cart",
     "sold_out": "Sold out",

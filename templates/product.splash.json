@@ -1,0 +1,17 @@
+{
+  "sections": {
+    "main": {
+      "type": "product-splash",
+      "settings": {
+        "overlay_color": "#2a6ec9",
+        "overlay_opacity": 40,
+        "accent_shop_color": "#e82222",
+        "accent_select_color": "#c96f3a",
+        "logo_mark": "RS"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
