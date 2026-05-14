@@ -4,6 +4,20 @@
       "skip_to_content": "Skip to content"
     }
   },
+  "catalog_splash": {
+    "nav": {
+      "placeholder": "Choose a menu in the theme editor (left column links)."
+    }
+  },
+  "product_splash": {
+    "add_to_cart": "Add To Cart",
+    "sold_out": "Sold out",
+    "added": "Added to cart",
+    "error": "We couldn\u2019t add that to the cart. Please try again.",
+    "nav": {
+      "placeholder": "Choose a menu in the theme editor (left column links)."
+    }
+  },
   "coming_soon": {
     "countdown": {
       "days": "Days",
