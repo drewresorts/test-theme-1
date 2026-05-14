@@ -4,9 +4,14 @@
       "skip_to_content": "Skip to content"
     }
   },
+  "splash_streams": {
+    "nav": {
+      "theme_settings": "Choose Site navigation menu in Theme settings (Splash streams page)."
+    }
+  },
   "catalog_splash": {
     "nav": {
-      "placeholder": "Choose a menu in the theme editor (left column links)."
+      "placeholder": "Choose Site navigation menu in Theme settings (Splash streams page)."
     }
   },
   "product_splash": {
@@ -15,7 +20,7 @@
     "added": "Added to cart",
     "error": "We couldn\u2019t add that to the cart. Please try again.",
     "nav": {
-      "placeholder": "Choose a menu in the theme editor (left column links)."
+      "placeholder": "Choose Site navigation menu in Theme settings (Splash streams page)."
     }
   },
   "coming_soon": {

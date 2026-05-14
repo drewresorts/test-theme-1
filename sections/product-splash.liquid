@@ -4,7 +4,7 @@
   assign accent_shop = section.settings.accent_shop_color | default: '#e82222'
   assign accent_select = section.settings.accent_select_color | default: '#c96f3a'
   assign bg_image = section.settings.background_image
-  assign side_menu = section.settings.side_menu
+  assign side_menu = settings.splash_navigation
   assign logo_text = section.settings.logo_mark | default: shop.name
   assign current_variant = product.selected_or_first_available_variant
   assign featured_img_url = current_variant.featured_image | default: product.featured_image
@@ -265,7 +265,7 @@
   }
 
   .product-splash__bg-fallback {
-    background-image: linear-gradient(135deg, #1a2440 0%, #0d1528 45%, #1e3358 100%);
+    background: transparent;
   }
 
   .product-splash__bg-overlay {
@@ -833,11 +833,6 @@
       "id": "logo_mark",
       "label": "t:product_splash.section.settings.logo_mark.label",
       "default": "RS"
-    },
-    {
-      "type": "link_list",
-      "id": "side_menu",
-      "label": "t:product_splash.section.settings.side_menu.label"
     },
     {
       "type": "text",

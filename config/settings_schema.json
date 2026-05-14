@@ -62,6 +62,13 @@
         "id": "splash_streams_logo",
         "label": "t:settings_schema.splash_streams.logo.label",
         "info": "t:settings_schema.splash_streams.logo.info"
+      },
+      {
+        "type": "link_list",
+        "id": "splash_navigation",
+        "label": "t:settings_schema.splash_streams.navigation.label",
+        "default": "main-menu",
+        "info": "t:settings_schema.splash_streams.navigation.info"
       }
     ]
   }

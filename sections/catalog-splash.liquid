@@ -3,7 +3,7 @@
   assign overlay_color = section.settings.overlay_color | default: '#1e6fd9'
   assign accent_shop = section.settings.accent_shop_color | default: '#e82222'
   assign bg_image = section.settings.background_image
-  assign side_menu = section.settings.side_menu
+  assign side_menu = settings.splash_navigation
   assign logo_text = section.settings.logo_mark | default: shop.name
   assign vertical_title = section.settings.vertical_title | default: 'collections'
   assign vertical_color = section.settings.vertical_title_color | default: '#0b1f3d'
@@ -157,7 +157,7 @@
   }
 
   .catalog-splash__bg-fallback {
-    background-image: linear-gradient(135deg, #1a2440 0%, #0d1528 45%, #1e3358 100%);
+    background: transparent;
   }
 
   .catalog-splash__bg-overlay {
@@ -460,11 +460,6 @@
       "id": "logo_mark",
       "label": "t:catalog_splash.section.settings.logo_mark.label",
       "default": "RS"
-    },
-    {
-      "type": "link_list",
-      "id": "side_menu",
-      "label": "t:catalog_splash.section.settings.side_menu.label"
     },
     {
       "type": "text",

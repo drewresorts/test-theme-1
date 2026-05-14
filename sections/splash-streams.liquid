@@ -3,55 +3,16 @@
   assign menu_logo = section.settings.menu_logo
   assign logo_width = section.settings.logo_width | default: 240
   assign logo_src_width = logo_width | times: 2
-  assign overlay_opacity = section.settings.overlay_opacity | default: 35
-  assign overlay_color = section.settings.overlay_color | default: '#000000'
-
-  assign stream_blocks = section.blocks | where: 'type', 'stream'
-  assign splash_menu = section.settings.menu
+  assign splash_menu = settings.splash_navigation
 -%}
 
 <section
-  class="splash-streams"
+  class="splash-streams splash-streams--chrome-only"
   data-splash-streams
   style="
-    --overlay-color: {{ overlay_color }};
-    --overlay-opacity: {{ overlay_opacity | divided_by: 100.0 }};
     --logo-width: {{ logo_width }}px;
   "
 >
-  <div class="splash-streams__bg" aria-hidden="true">
-    <div class="splash-streams__player-shell">
-      <iframe
-        class="splash-streams__player"
-        data-splash-streams-iframe
-        title=""
-        frameborder="0"
-        allow="autoplay; encrypted-media"
-        referrerpolicy="strict-origin-when-cross-origin"
-        tabindex="-1"
-      ></iframe>
-    </div>
-    <div class="splash-streams__selfie-shell">
-      <video
-        class="splash-streams__selfie"
-        data-splash-streams-selfie
-        playsinline
-        muted
-        autoplay
-      ></video>
-    </div>
-    <div class="splash-streams__overlay"></div>
-  </div>
-
-  <button
-    type="button"
-    class="splash-streams__camera-prompt"
-    data-splash-streams-camera-prompt
-    hidden
-  >
-    Tap to use your camera
-  </button>
-
   <div class="splash-streams__chrome">
     <button
       type="button"
@@ -148,165 +109,35 @@
           {%- endfor -%}
         {%- else -%}
           <li class="splash-streams__nav-item splash-streams__nav-item--empty">
-            <span class="splash-streams__nav-empty">Select a navigation menu in the theme editor for this section.</span>
+            <span class="splash-streams__nav-empty">{{ 'splash_streams.nav.theme_settings' | t }}</span>
           </li>
         {%- endif -%}
       </ul>
       </nav>
     </div>
   </div>
-
-  {%- if stream_blocks.size > 0 -%}
-    <p class="splash-streams__key-hint" aria-live="polite">Change stream with arrow keys</p>
-  {%- endif -%}
-
-  <template data-splash-streams-data>
-    [
-      {%- for block in stream_blocks -%}
-        {%- liquid
-          assign raw = block.settings.youtube_url | strip
-        -%}
-        { "url": {{ raw | json }} }{% unless forloop.last %},{% endunless %}
-      {%- endfor -%}
-    ]
-  </template>
 </section>
 
 {% stylesheet %}
   @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap');
 
-  .splash-streams {
+  .splash-streams.splash-streams--chrome-only {
     position: relative;
-    display: grid;
-    place-items: center;
+    z-index: 2;
     min-height: 100svh;
     width: 100%;
-    overflow: hidden;
-    isolation: isolate;
-    background: #000;
+    display: grid;
+    place-items: center;
+    background: transparent;
     padding: 3rem 1.25rem;
-  }
-
-  .splash-streams__bg {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-  }
-
-  /* YouTube cannot hide title/channel UI via params; crop it outside the viewport. */
-  .splash-streams__player-shell {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    z-index: 0;
-    pointer-events: none;
-  }
-
-  .splash-streams__player {
-    position: absolute;
-    left: 50%;
-    top: 56%;
-    width: max(100vw, 177.78vh);
-    height: max(56.25vw, 100vh);
-    transform: translate(-50%, -50%) scale(1.32);
-    transform-origin: center center;
-    pointer-events: none;
-    border: 0;
-  }
-
-  .splash-streams__selfie-shell {
-    display: none;
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    z-index: 0;
-    pointer-events: none;
-    background: #000;
-  }
-
-  .splash-streams__selfie {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    transform: scaleX(-1);
-  }
-
-  .splash-streams__camera-prompt {
-    position: absolute;
-    bottom: max(1.25rem, env(safe-area-inset-bottom));
-    left: 50%;
-    z-index: 3;
-    transform: translateX(-50%);
-    margin: 0;
-    padding: 0.65rem 1.1rem;
-    max-width: min(92vw, 22rem);
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, #fff 35%, transparent);
-    background: color-mix(in srgb, #000 55%, transparent);
-    color: #fff;
-    font: inherit;
-    font-size: 0.85rem;
-    letter-spacing: 0.04em;
-    cursor: pointer;
-    pointer-events: auto;
-  }
-
-  .splash-streams__camera-prompt[hidden] {
-    display: none;
-  }
-
-  .splash-streams__camera-prompt:focus-visible {
-    outline: 2px solid #fff;
-    outline-offset: 2px;
-  }
-
-  @media (max-width: 749px) {
-    .splash-streams:not(.splash-streams--selfie-fallback) .splash-streams__player-shell {
-      display: none;
-    }
-
-    .splash-streams:not(.splash-streams--selfie-fallback) .splash-streams__selfie-shell {
-      display: block;
-    }
-
-    .splash-streams--selfie-fallback .splash-streams__selfie-shell {
-      display: none;
-    }
-
-    .splash-streams--selfie-fallback .splash-streams__player-shell {
-      display: block;
-    }
-  }
-
-  @media (min-width: 750px) {
-    .splash-streams__selfie-shell {
-      display: none !important;
-    }
-
-    .splash-streams__camera-prompt {
-      display: none !important;
-    }
-  }
-
-  .splash-streams__overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    background: var(--overlay-color);
-    opacity: var(--overlay-opacity);
-    pointer-events: auto;
+    isolation: isolate;
+    overflow: visible;
   }
 
   .splash-streams__chrome {
     display: flex;
     position: relative;
     z-index: 2;
-    grid-column: 1;
-    grid-row: 1;
-    place-self: center;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -335,7 +166,6 @@
     position: fixed;
     inset: 0;
     z-index: 20;
-    place-self: stretch;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -638,47 +468,6 @@
     }
   }
 
-  .splash-streams__key-hint {
-    display: none;
-    position: absolute;
-    bottom: max(0.75rem, env(safe-area-inset-bottom));
-    left: 50%;
-    z-index: 4;
-    transform: translateX(-50%);
-    margin: 0;
-    max-width: min(92vw, 28rem);
-    padding: 0 0.5rem;
-    text-align: center;
-    font-size: 0.68rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, #fff 72%, transparent);
-    text-shadow:
-      0 0 8px #000,
-      0 1px 2px #000;
-    pointer-events: none;
-  }
-
-  @media (min-width: 750px) {
-    .splash-streams__key-hint {
-      display: block;
-    }
-  }
-
-  .splash-streams--nav-open .splash-streams__key-hint {
-    opacity: 0;
-    transition: opacity 0.15s ease;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .splash-streams__selfie-shell {
-      display: none !important;
-    }
-
-    .splash-streams__player-shell {
-      display: block !important;
-    }
-  }
 {% endstylesheet %}
 
 {% javascript %}
@@ -686,80 +475,9 @@
     const root = document.querySelector('[data-splash-streams]');
     if (!root) return;
 
-    const iframe = root.querySelector('[data-splash-streams-iframe]');
-    const selfieVideo = root.querySelector('[data-splash-streams-selfie]');
-    const cameraPrompt = root.querySelector('[data-splash-streams-camera-prompt]');
-    const dataEl = root.querySelector('[data-splash-streams-data]');
     const logoToggle = root.querySelector('[data-splash-logo-toggle]');
     const navEl = root.querySelector('[data-splash-nav]');
     const backdrop = root.querySelector('[data-splash-nav-backdrop]');
-    if (!iframe || !dataEl || !selfieVideo) return;
-
-    let streams = [];
-    try {
-      streams = JSON.parse(dataEl.innerHTML || '[]');
-    } catch (e) {
-      streams = [];
-    }
-    streams = (streams || []).filter((s) => s && typeof s.url === 'string' && s.url.trim().length > 0);
-
-    const mobileMql = window.matchMedia
-      ? window.matchMedia('(max-width: 749px)')
-      : { matches: false, addEventListener: function () {}, addListener: function () {} };
-    function isMobile() {
-      return mobileMql.matches;
-    }
-
-    const prefersReducedMotion =
-      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    function parseYouTubeId(inputUrl) {
-      const raw = (inputUrl || '').trim();
-      if (!raw) return null;
-      try {
-        const url = new URL(raw, window.location.origin);
-        if (url.hostname === 'youtu.be') {
-          return (url.pathname || '').replace('/', '') || null;
-        }
-        if (url.hostname.endsWith('youtube.com') || url.hostname.endsWith('youtube-nocookie.com')) {
-          const v = url.searchParams.get('v');
-          if (v) return v;
-          const match = (url.pathname || '').match(/\/(live|embed|shorts)\/([^/?#]+)/i);
-          if (match && match[2]) return match[2];
-        }
-      } catch (e) {
-        // ignore
-      }
-      const fallbackMatch = raw.match(/[?&]v=([^&]+)/);
-      if (fallbackMatch && fallbackMatch[1]) return fallbackMatch[1];
-      return null;
-    }
-
-    function buildEmbedUrl(videoId) {
-      const id = String(videoId).trim();
-      const q = [
-        'autoplay=1',
-        'mute=1',
-        'loop=1',
-        'playlist=' + encodeURIComponent(id),
-        'controls=0',
-        'showinfo=0',
-        'rel=0',
-        'iv_load_policy=3',
-        'modestbranding=1',
-        'playsinline=1',
-        'fs=0',
-        'disablekb=1',
-      ].join('&');
-      return 'https://www.youtube.com/embed/' + encodeURIComponent(id) + '?' + q;
-    }
-
-    const ids = streams
-      .map((s) => parseYouTubeId(s.url))
-      .filter(Boolean);
-    const hasYoutube = ids.length > 0;
-
-    let index = 0;
 
     function closeNav() {
       root.classList.remove('splash-streams--nav-open');
@@ -797,220 +515,15 @@
       }
     }
 
-    function stopSelfie() {
-      root.classList.remove('splash-streams--camera-live');
-      try {
-        const ms = selfieVideo.srcObject;
-        if (ms && ms.getTracks) {
-          ms.getTracks().forEach(function (t) {
-            t.stop();
-          });
-        }
-        selfieVideo.srcObject = null;
-      } catch (e) {
-        // ignore
-      }
-    }
-
-    function switchTo(nextIndex) {
-      if (!hasYoutube) return;
-      if (isMobile() && !root.classList.contains('splash-streams--selfie-fallback')) return;
-      index = (nextIndex + ids.length) % ids.length;
-      const videoId = ids[index];
-      const url = buildEmbedUrl(videoId);
-      iframe.src = 'about:blank';
-      setTimeout(function () {
-        iframe.src = url;
-      }, 30);
-    }
-
-    function showCameraPrompt() {
-      if (!cameraPrompt || !isMobile()) return;
-      cameraPrompt.hidden = false;
-      cameraPrompt.removeAttribute('hidden');
-    }
-
-    function hideCameraPrompt() {
-      if (!cameraPrompt) return;
-      cameraPrompt.hidden = true;
-      cameraPrompt.setAttribute('hidden', '');
-    }
-
-    function startSelfie() {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        return Promise.resolve(false);
-      }
-      stopSelfie();
-      return navigator.mediaDevices
-        .getUserMedia({
-          video: { facingMode: { ideal: 'user' } },
-          audio: false,
-        })
-        .then(function (stream) {
-          selfieVideo.srcObject = stream;
-          return selfieVideo.play().then(function () {
-            root.classList.remove('splash-streams--selfie-fallback');
-            iframe.src = 'about:blank';
-            hideCameraPrompt();
-            if (isMobile()) {
-              root.classList.add('splash-streams--camera-live');
-            }
-            return true;
-          });
-        })
-        .catch(function () {
-          return false;
-        });
-    }
-
-    function useYoutubeOnMobile() {
-      root.classList.add('splash-streams--selfie-fallback');
-      hideCameraPrompt();
-      stopSelfie();
-      if (hasYoutube) {
-        switchTo(index);
-      }
-    }
-
-    function syncLayout() {
-      if (isMobile()) {
-        closeNav();
-        stopSelfie();
-        root.classList.remove('splash-streams--selfie-fallback');
-        startSelfie().then(function (ok) {
-          if (!ok) {
-            if (cameraPrompt) {
-              showCameraPrompt();
-            } else {
-              useYoutubeOnMobile();
-            }
-          }
-        });
-      } else {
-        closeNav();
-        hideCameraPrompt();
-        stopSelfie();
-        root.classList.remove('splash-streams--selfie-fallback');
-        if (hasYoutube) {
-          switchTo(index);
-        } else {
-          iframe.src = 'about:blank';
-        }
-      }
-    }
-
     function onKeyDown(e) {
       if (!e) return;
       if (e.key === 'Escape' && root.classList.contains('splash-streams--nav-open')) {
         e.preventDefault();
         closeNav();
-        return;
-      }
-      if (!hasYoutube) return;
-      if (isMobile() && !root.classList.contains('splash-streams--selfie-fallback')) return;
-      const tag = (e.target && e.target.tagName) ? String(e.target.tagName).toLowerCase() : '';
-      const editable =
-        tag === 'input' || tag === 'textarea' || tag === 'select' || (e.target && e.target.isContentEditable);
-      if (editable) return;
-
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        switchTo(index - 1);
-      }
-      if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        switchTo(index + 1);
       }
     }
 
     document.addEventListener('keydown', onKeyDown);
-
-    // Mobile swipe (bottom of the screen) switches from front camera to the
-    // configured YouTube streams and continues cycling between them.
-    let swipeStartX = 0;
-    let swipeStartY = 0;
-    let swipeStartAt = 0;
-    let swipeArmed = false;
-
-    function shouldIgnoreTouchTarget(target) {
-      if (!target || !target.closest) return false;
-      // Avoid fighting with taps on buttons/links/inputs.
-      return Boolean(
-        target.closest('button,a,input,textarea,select,label,[role="button"],[role="link"]')
-      );
-    }
-
-    function touchInBottomZone(clientY) {
-      // Use a conservative bottom region so gestures don't conflict with scrolling.
-      return clientY > window.innerHeight * 0.65;
-    }
-
-    function loadYoutubeIndex(nextIndex) {
-      if (!hasYoutube) return;
-      closeNav();
-      root.classList.add('splash-streams--selfie-fallback');
-      stopSelfie();
-
-      index = ((nextIndex % ids.length) + ids.length) % ids.length;
-      const videoId = ids[index];
-      const url = buildEmbedUrl(videoId);
-      iframe.src = 'about:blank';
-      setTimeout(function () {
-        iframe.src = url;
-      }, 30);
-    }
-
-    root.addEventListener(
-      'touchstart',
-      function (e) {
-        if (!isMobile() || !hasYoutube) return;
-        if (root.classList.contains('splash-streams--nav-open')) return;
-        if (!e.changedTouches || !e.changedTouches.length) return;
-        const t = e.changedTouches[0];
-        if (!touchInBottomZone(t.clientY)) return;
-        if (shouldIgnoreTouchTarget(e.target)) return;
-
-        swipeStartX = t.clientX;
-        swipeStartY = t.clientY;
-        swipeStartAt = Date.now();
-        swipeArmed = true;
-      },
-      { passive: true }
-    );
-
-    root.addEventListener(
-      'touchend',
-      function (e) {
-        if (!isMobile() || !hasYoutube) return;
-        if (!swipeArmed) return;
-        swipeArmed = false;
-        if (!e.changedTouches || !e.changedTouches.length) return;
-
-        const t = e.changedTouches[0];
-        const dx = t.clientX - swipeStartX;
-        const dy = t.clientY - swipeStartY;
-        const dt = Date.now() - swipeStartAt;
-
-        // Horizontal swipe with reasonable distance + speed.
-        if (dt > 900) return;
-        if (Math.abs(dx) < 60) return;
-        if (Math.abs(dx) < Math.abs(dy) * 1.1) return;
-
-        // Swipe left => next stream; swipe right => previous stream.
-        const dir = dx < 0 ? 1 : -1;
-        loadYoutubeIndex(index + dir);
-        e.preventDefault();
-      },
-      { passive: false }
-    );
-
-    if (prefersReducedMotion) {
-      closeNav();
-      if (hasYoutube) {
-        switchTo(0);
-      }
-      return;
-    }
 
     if (logoToggle) {
       logoToggle.addEventListener('click', function (e) {
@@ -1033,24 +546,6 @@
         }
       });
     }
-
-    if (cameraPrompt) {
-      cameraPrompt.addEventListener('click', function () {
-        startSelfie().then(function (ok) {
-          if (!ok) {
-            useYoutubeOnMobile();
-          }
-        });
-      });
-    }
-
-    if (mobileMql.addEventListener) {
-      mobileMql.addEventListener('change', syncLayout);
-    } else if (mobileMql.addListener) {
-      mobileMql.addListener(syncLayout);
-    }
-
-    syncLayout();
   })();
 {% endjavascript %}
 
@@ -1062,14 +557,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "t:splash_streams_page.section.settings.logo_help.content"
-    },
-    {
-      "type": "link_list",
-      "id": "menu",
-      "label": "Navigation menu",
-      "default": "main-menu",
-      "info": "Same links as your storefront navigation (Online Store -> Navigation). Shows top-level items and one submenu level."
+      "content": "t:splash_streams_page.section.settings.chrome_intro.content"
     },
     {
       "type": "image_picker",
@@ -1086,45 +574,11 @@
       "step": 10,
       "unit": "px",
       "default": 260
-    },
-    {
-      "type": "color",
-      "id": "overlay_color",
-      "label": "Overlay color",
-      "default": "#000000"
-    },
-    {
-      "type": "range",
-      "id": "overlay_opacity",
-      "label": "Overlay opacity",
-      "min": 0,
-      "max": 80,
-      "step": 5,
-      "unit": "%",
-      "default": 35
-    }
-  ],
-  "blocks": [
-    {
-      "type": "stream",
-      "name": "YouTube stream",
-      "settings": [
-        {
-          "type": "text",
-          "id": "youtube_url",
-          "label": "YouTube URL",
-          "default": "https://www.youtube.com/watch?v=erBoOFKTH4E"
-        }
-      ]
     }
   ],
   "presets": [
     {
-      "name": "Splash streams",
-      "blocks": [
-        { "type": "stream" },
-        { "type": "stream" }
-      ]
+      "name": "Splash streams"
     }
   ]
 }

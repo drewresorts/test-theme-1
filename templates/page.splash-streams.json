@@ -11,24 +11,7 @@
   "sections": {
     "main": {
       "type": "splash-streams",
-      "settings": {
-        "menu": "main-menu"
-      },
-      "blocks": {
-        "stream-1": {
-          "type": "stream",
-          "settings": {
-            "youtube_url": "https://www.youtube.com/watch?v=erBoOFKTH4E"
-          }
-        },
-        "stream-2": {
-          "type": "stream",
-          "settings": {
-            "youtube_url": "https://www.youtube.com/watch?v=bY9Xyjr7nvU"
-          }
-        }
-      },
-      "block_order": ["stream-1", "stream-2"]
+      "settings": {}
     }
   },
   "order": ["main"]

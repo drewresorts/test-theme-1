@@ -9,7 +9,7 @@
 -%}
 
 <section
-  class="coming-soon"
+  class="coming-soon{% if stream_url == blank %} coming-soon--stream-global{% endif %}"
   data-coming-soon
   data-stream-url="{{ stream_url | escape }}"
   data-launch-date="{{ launch_date | escape }}"
@@ -168,6 +168,10 @@
     color: var(--accent-color);
     font-family: var(--font-body-family, system-ui, sans-serif);
     isolation: isolate;
+  }
+
+  .coming-soon--stream-global .coming-soon__media {
+    display: none;
   }
 
   .coming-soon__media {

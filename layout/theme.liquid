@@ -34,6 +34,7 @@
       html, body { margin: 0; padding: 0; background: {{ settings.background_color | default: '#0b0b0f' }}; color: {{ settings.text_color | default: '#ffffff' }}; }
       body { font-family: var(--font-body-family); -webkit-font-smoothing: antialiased; }
       img, video { max-width: 100%; display: block; }
+      .theme-frame { position: relative; z-index: 1; isolation: isolate; min-height: 100svh; }
       *, *::before, *::after { box-sizing: border-box; }
       a { color: inherit; }
       :focus-visible { outline: 2px solid {{ settings.text_color | default: '#ffffff' }}; outline-offset: 2px; }
@@ -46,9 +47,13 @@
   <body class="template-{{ template | replace: '.', '-' | handle }}">
     <a class="visually-hidden" href="#MainContent">{{ 'general.accessibility.skip_to_content' | t }}</a>
 
-    <main id="MainContent" role="main">
-      {{ content_for_layout }}
-    </main>
+    {% section 'site-stream-backdrop' %}
+
+    <div class="theme-frame">
+      <main id="MainContent" role="main">
+        {{ content_for_layout }}
+      </main>
+    </div>
 
     {% style %}
       .visually-hidden {

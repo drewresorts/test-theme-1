@@ -38,6 +38,10 @@
       "logo": {
         "label": "Center logo",
         "info": "Use Select image to open your library. This is not a URL field."
+      },
+      "navigation": {
+        "label": "Site navigation menu",
+        "info": "Used for the splash logo menu, product splash, and catalog splash left column. Same links as Online Store → Navigation."
       }
     }
   },
@@ -108,6 +112,9 @@
       "settings": {
         "logo_help": {
           "content": "Set the center logo in Theme settings → Splash streams page → Center logo (image library, not a URL)."
+        },
+        "chrome_intro": {
+          "content": "Homepage logo and menu only. YouTube streams and tint behind the whole site are edited under Theme settings → Site stream backdrop."
         }
       }
     }
@@ -188,6 +195,30 @@
       }
     }
   },
+  "site_stream_backdrop": {
+    "section": {
+      "name": "Site stream backdrop",
+      "settings": {
+        "intro": "Full-screen YouTube / selfie camera background shown behind every page. Edit streams here once; use Theme settings → Splash streams page → Site navigation menu for links used on splash, product, and catalog layouts.",
+        "overlay_color": {
+          "label": "Overlay color"
+        },
+        "overlay_opacity": {
+          "label": "Overlay opacity"
+        }
+      }
+    },
+    "blocks": {
+      "stream": {
+        "name": "YouTube stream",
+        "settings": {
+          "youtube_url": {
+            "label": "YouTube URL"
+          }
+        }
+      }
+    }
+  },
   "catalog_splash": {
     "section": {
       "name": "Catalog splash grid",
@@ -195,7 +226,7 @@
         "default": "Catalog splash grid"
       },
       "settings": {
-        "intro": "Full-viewport collections hub: tinted background, left menu, 3-column tile grid, and vertical title. Add tiles; link each to a collection or a custom URL.",
+        "intro": "Full-viewport collections hub: optional background image, left menu (from Theme settings → Site navigation menu), 3-column tile grid, and vertical title. Add tiles; link each to a collection or a custom URL.",
         "background_image": {
           "label": "Background image"
         },
@@ -210,9 +241,6 @@
         },
         "logo_mark": {
           "label": "Top-left mark (text)"
-        },
-        "side_menu": {
-          "label": "Left column menu"
         },
         "nav_aria_label": {
           "label": "Left menu (accessibility label)"
@@ -250,7 +278,7 @@
     "section": {
       "name": "Full-bleed product page",
       "settings": {
-        "intro": "Full-viewport product layout: background image, left navigation, hero product image, and right-side buy box. Assign a menu for the left column (first link uses the red accent).",
+        "intro": "Full-viewport product layout: optional background image over the global live stream, left navigation (Theme settings → Site navigation menu), hero product image, and right-side buy box. First nav link uses the red accent.",
         "background_image": {
           "label": "Background image"
         },
@@ -268,9 +296,6 @@
         },
         "logo_mark": {
           "label": "Top-left mark (text)"
-        },
-        "side_menu": {
-          "label": "Left column menu"
         },
         "nav_aria_label": {
           "label": "Left menu (accessibility label)"

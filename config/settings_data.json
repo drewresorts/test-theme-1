@@ -14,7 +14,36 @@
     "body_font": "sans_serif_n4",
     "stream_origin": "https://www.youtube.com/watch?v=TxS4AlWPqNQ",
     "splash_streams_logo": "shopify://shop_images/duet_circle_logo_46a3a8f9-f5fb-4787-ab9b-dd9cdda86de4.png",
+    "splash_navigation": "main-menu",
     "content_for_index": []
+  },
+  "sections": {
+    "site-stream-backdrop": {
+      "type": "site-stream-backdrop",
+      "disabled": false,
+      "settings": {
+        "overlay_color": "#0b0b0f",
+        "overlay_opacity": 20
+      },
+      "blocks": {
+        "stream_jqHxD6": {
+          "type": "stream",
+          "settings": {
+            "youtube_url": "https://www.youtube.com/watch?v=2ywP2Zzs6Qs"
+          }
+        },
+        "stream_cqRFbW": {
+          "type": "stream",
+          "settings": {
+            "youtube_url": "https://www.youtube.com/watch?v=erBoOFKTH4E"
+          }
+        }
+      },
+      "block_order": [
+        "stream_jqHxD6",
+        "stream_cqRFbW"
+      ]
+    }
   },
   "presets": {
     "Default": {
