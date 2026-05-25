@@ -3545,6 +3545,40 @@
         "logo_help": {
           "content": "Set the center logo in Theme settings → Splash streams page → Center logo (image library, not a URL)."
         }
+      },
+      "blocks": {
+        "email_signup": {
+          "name": "Email signup",
+          "settings": {
+            "position": {
+              "label": "Position",
+              "options__1": {
+                "label": "Bottom of screen"
+              },
+              "options__2": {
+                "label": "Below logo (center)"
+              }
+            },
+            "heading": {
+              "label": "Heading"
+            },
+            "text": {
+              "label": "Description"
+            },
+            "placeholder": {
+              "label": "Email placeholder"
+            },
+            "button_label": {
+              "label": "Button label"
+            },
+            "success_message": {
+              "label": "Success message"
+            },
+            "lowercase_text": {
+              "label": "Lowercase text (match menu style)"
+            }
+          }
+        }
       }
     }
   },
