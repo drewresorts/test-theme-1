@@ -879,6 +879,11 @@
   }
 {% endstylesheet %}
 
+<script>
+  window.splashStreamsStrings = window.splashStreamsStrings || {};
+  window.splashStreamsStrings.emailError = {{ 'splash_streams.email.error' | t | json }};
+</script>
+
 {% javascript %}
   (function () {
     const root = document.querySelector('[data-splash-streams]');
@@ -1250,15 +1255,19 @@
 
     syncLayout();
 
-    function initSplashEmailSignup(root) {
-      if (!root || !root.hasAttribute('data-splash-email-just-success')) return;
+    const SPLASH_EMAIL_RESET_MS = 5000;
 
+    function showSplashEmailSuccessSequence(root) {
       const formPanel = root.querySelector('[data-splash-email-form-panel]');
       const successPanel = root.querySelector('[data-splash-email-success-panel]');
-      const successMessage = root.querySelector('[data-splash-email-success-panel] [role="status"]');
+      const successMessage = successPanel && successPanel.querySelector('[role="status"]');
+      const errorEl = root.querySelector('[data-splash-email-error]');
       if (!formPanel || !successPanel) return;
 
-      const resetDelayMs = 5000;
+      if (errorEl) {
+        errorEl.hidden = true;
+        errorEl.textContent = '';
+      }
 
       formPanel.hidden = true;
       successPanel.hidden = false;
@@ -1266,7 +1275,8 @@
         successMessage.focus({ preventScroll: true });
       }
 
-      window.setTimeout(function () {
+      window.clearTimeout(root.splashEmailResetTimer);
+      root.splashEmailResetTimer = window.setTimeout(function () {
         successPanel.classList.add('is-fading-out');
         window.setTimeout(function () {
           successPanel.hidden = true;
@@ -1286,30 +1296,126 @@
             emailInput.removeAttribute('aria-invalid');
           }
 
-          if (window.history && window.history.replaceState) {
-            try {
-              const url = new URL(window.location.href);
-              if (url.hash) {
-                url.hash = '';
-                window.history.replaceState(null, '', url.pathname + url.search);
-              }
-            } catch (e) {
-              /* ignore */
-            }
+          const submitBtn = formPanel.querySelector('[type="submit"]');
+          if (submitBtn) {
+            submitBtn.disabled = false;
           }
         }, 250);
-      }, resetDelayMs);
+      }, SPLASH_EMAIL_RESET_MS);
     }
 
-    function initAllSplashEmailSignups() {
-      document.querySelectorAll('[data-splash-email-root][data-splash-email-just-success]').forEach(initSplashEmailSignup);
+    function splashEmailResponseIsSuccess(html, blockId) {
+      if (!html) return false;
+      if (html.indexOf('data-splash-email-just-success') !== -1) return true;
+      if (blockId && html.indexOf('SplashEmailSuccess-' + blockId) !== -1) return true;
+      if (html.indexOf('newsletter-form__message--success') !== -1) return true;
+      if (html.indexOf('coming-soon__form-message--success') !== -1) return true;
+      return false;
+    }
+
+    function splashEmailResponseIsError(html, status) {
+      if (status === 422) return true;
+      if (!html) return true;
+      if (html.indexOf('captcha') !== -1 && html.indexOf('h-captcha') !== -1) return true;
+      if (html.indexOf('splash-streams__email-message--error') !== -1) return true;
+      if (html.indexOf('newsletter-form__message') !== -1 && html.indexOf('icon-error') !== -1) return true;
+      return false;
+    }
+
+    function initSplashEmailForm(root) {
+      if (!root) return;
+
+      const formPanel = root.querySelector('[data-splash-email-form-panel]');
+      const form = formPanel && formPanel.querySelector('form.splash-streams__email-form');
+      if (!form || form.dataset.splashEmailBound === 'true') return;
+      form.dataset.splashEmailBound = 'true';
+
+      const blockId = root.getAttribute('data-splash-email-block-id');
+      const errorEl = root.querySelector('[data-splash-email-error]');
+      const genericError =
+        (window.splashStreamsStrings && window.splashStreamsStrings.emailError) ||
+        'Please enter a valid email address.';
+
+      if (root.hasAttribute('data-splash-email-just-success')) {
+        showSplashEmailSuccessSequence(root);
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        if (errorEl) {
+          errorEl.hidden = true;
+          errorEl.textContent = '';
+        }
+
+        const submitBtn = form.querySelector('[type="submit"]');
+        if (submitBtn) {
+          submitBtn.disabled = true;
+        }
+
+        const formAction = form.getAttribute('action') || '/contact';
+
+        fetch(formAction, {
+          method: 'POST',
+          body: new FormData(form),
+          credentials: 'same-origin',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+        })
+          .then(function (response) {
+            return response.text().then(function (html) {
+              return { status: response.status, ok: response.ok, html: html };
+            });
+          })
+          .then(function (result) {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+            }
+
+            if (splashEmailResponseIsSuccess(result.html, blockId)) {
+              showSplashEmailSuccessSequence(root);
+              return;
+            }
+
+            if (splashEmailResponseIsError(result.html, result.status)) {
+              if (errorEl) {
+                errorEl.hidden = false;
+                errorEl.textContent = genericError;
+              }
+              return;
+            }
+
+            if (result.ok) {
+              showSplashEmailSuccessSequence(root);
+              return;
+            }
+
+            if (errorEl) {
+              errorEl.hidden = false;
+              errorEl.textContent = genericError;
+            }
+          })
+          .catch(function () {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+            }
+            if (errorEl) {
+              errorEl.hidden = false;
+              errorEl.textContent = genericError;
+            }
+          });
+      });
+    }
+
+    function initAllSplashEmailSignups(scope) {
+      const container = scope || document;
+      container.querySelectorAll('[data-splash-email-root]').forEach(initSplashEmailForm);
     }
 
     initAllSplashEmailSignups();
     document.addEventListener('shopify:section:load', function (event) {
-      const section = event.target;
-      if (!section) return;
-      section.querySelectorAll('[data-splash-email-root][data-splash-email-just-success]').forEach(initSplashEmailSignup);
+      initAllSplashEmailSignups(event.target);
     });
   })();
 {% endjavascript %}
