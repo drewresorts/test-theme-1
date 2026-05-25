@@ -938,13 +938,15 @@
       return null;
     }
 
-    function buildEmbedUrl(videoId) {
+    function isLiveSourceUrl(inputUrl) {
+      return /\/live(\/|$)/i.test(String(inputUrl || ''));
+    }
+
+    function buildEmbedUrl(videoId, sourceUrl) {
       const id = String(videoId).trim();
-      const q = [
+      const common = [
         'autoplay=1',
         'mute=1',
-        'loop=1',
-        'playlist=' + encodeURIComponent(id),
         'controls=0',
         'showinfo=0',
         'rel=0',
@@ -953,9 +955,17 @@
         'playsinline=1',
         'fs=0',
         'disablekb=1',
-      ].join('&');
-      return 'https://www.youtube.com/embed/' + encodeURIComponent(id) + '?' + q;
+      ];
+      // Loop + playlist makes live streams stutter/reload; skip for /live/ URLs.
+      if (!isLiveSourceUrl(sourceUrl)) {
+        common.push('loop=1', 'playlist=' + encodeURIComponent(id));
+      }
+      return 'https://www.youtube.com/embed/' + encodeURIComponent(id) + '?' + common.join('&');
     }
+
+    let currentVideoId = null;
+    let lastLayoutMode = null;
+    let syncLayoutTimer = null;
 
     const ids = streams
       .map((s) => parseYouTubeId(s.url))
@@ -1015,16 +1025,39 @@
       }
     }
 
+    function streamSourceUrlAt(i) {
+      const entry = streams[i];
+      return entry && typeof entry.url === 'string' ? entry.url : '';
+    }
+
+    function applyYoutubeVideo(videoId, sourceUrl, forceReload) {
+      if (!hasYoutube || !videoId) return;
+      const url = buildEmbedUrl(videoId, sourceUrl);
+      const changingVideo = currentVideoId !== videoId;
+
+      if (!forceReload && !changingVideo && iframe.src && iframe.src.indexOf(videoId) !== -1) {
+        return;
+      }
+
+      currentVideoId = videoId;
+      root.dataset.splashActiveVideo = videoId;
+
+      if (changingVideo && iframe.src && iframe.src !== 'about:blank') {
+        iframe.src = 'about:blank';
+        window.setTimeout(function () {
+          iframe.src = url;
+        }, 30);
+      } else {
+        iframe.src = url;
+      }
+    }
+
     function switchTo(nextIndex) {
       if (!hasYoutube) return;
       if (isMobile() && !root.classList.contains('splash-streams--selfie-fallback')) return;
-      index = (nextIndex + ids.length) % ids.length;
-      const videoId = ids[index];
-      const url = buildEmbedUrl(videoId);
-      iframe.src = 'about:blank';
-      setTimeout(function () {
-        iframe.src = url;
-      }, 30);
+      const newIndex = ((nextIndex % ids.length) + ids.length) % ids.length;
+      index = newIndex;
+      applyYoutubeVideo(ids[index], streamSourceUrlAt(index), false);
     }
 
     function showCameraPrompt() {
@@ -1042,6 +1075,18 @@
     function startSelfie() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         return Promise.resolve(false);
+      }
+      if (root.classList.contains('splash-streams--camera-live') && selfieVideo.srcObject) {
+        try {
+          const tracks = selfieVideo.srcObject.getTracks();
+          if (tracks.some(function (t) {
+            return t.readyState === 'live';
+          })) {
+            return Promise.resolve(true);
+          }
+        } catch (e) {
+          // continue to restart camera
+        }
       }
       stopSelfie();
       return navigator.mediaDevices
@@ -1075,8 +1120,17 @@
       }
     }
 
-    function syncLayout() {
-      if (isMobile()) {
+    function syncLayoutNow() {
+      const mode = isMobile() ? 'mobile' : 'desktop';
+
+      if (mode === 'mobile') {
+        if (
+          mode === lastLayoutMode &&
+          (root.classList.contains('splash-streams--camera-live') ||
+            root.classList.contains('splash-streams--selfie-fallback'))
+        ) {
+          return;
+        }
         closeNav();
         stopSelfie();
         root.classList.remove('splash-streams--selfie-fallback');
@@ -1090,16 +1144,27 @@
           }
         });
       } else {
+        if (mode === lastLayoutMode && currentVideoId && iframe.dataset.splashActiveVideo) {
+          return;
+        }
         closeNav();
         hideCameraPrompt();
         stopSelfie();
         root.classList.remove('splash-streams--selfie-fallback');
         if (hasYoutube) {
-          switchTo(index);
+          applyYoutubeVideo(ids[index], streamSourceUrlAt(index), false);
         } else {
           iframe.src = 'about:blank';
+          currentVideoId = null;
         }
       }
+
+      lastLayoutMode = mode;
+    }
+
+    function syncLayout() {
+      window.clearTimeout(syncLayoutTimer);
+      syncLayoutTimer = window.setTimeout(syncLayoutNow, 200);
     }
 
     function onKeyDown(e) {
@@ -1153,14 +1218,8 @@
       closeNav();
       root.classList.add('splash-streams--selfie-fallback');
       stopSelfie();
-
       index = ((nextIndex % ids.length) + ids.length) % ids.length;
-      const videoId = ids[index];
-      const url = buildEmbedUrl(videoId);
-      iframe.src = 'about:blank';
-      setTimeout(function () {
-        iframe.src = url;
-      }, 30);
+      applyYoutubeVideo(ids[index], streamSourceUrlAt(index), true);
     }
 
     root.addEventListener(
