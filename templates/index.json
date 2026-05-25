@@ -46,7 +46,7 @@
       "settings": {
         "menu": "main-menu",
         "menu_logo": "shopify://shop_images/duet_web_menu_star.png",
-        "logo_width": 400,
+        "logo_width": 450,
         "overlay_color": "#0b0b0f",
         "overlay_opacity": 50
       }
