@@ -295,6 +295,33 @@
       >
     {%- endif -%}
 
+    {%- liquid
+      assign splash_streams_page = false
+      if template.name == 'page' and template.suffix == 'splash-streams'
+        assign splash_streams_page = true
+      endif
+    -%}
+
+    {%- if splash_streams_page -%}
+      {% style %}
+        body.layout-splash-streams {
+          display: block;
+          min-height: 100svh;
+          margin: 0;
+        }
+
+        body.layout-splash-streams #MainContent {
+          min-height: 100svh;
+          padding: 0;
+          margin: 0;
+        }
+
+        body.layout-splash-streams .shopify-section {
+          margin: 0;
+        }
+      {% endstyle %}
+    {%- endif -%}
+
     <script>
       if (Shopify.designMode) {
         document.documentElement.classList.add('shopify-design-mode');
@@ -302,22 +329,26 @@
     </script>
   </head>
 
-  <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
-    <a class="skip-to-content-link button visually-hidden" href="#MainContent">
-      {{ 'accessibility.skip_to_text' | t }}
-    </a>
+  <body class="gradient{% if splash_streams_page %} layout-splash-streams{% endif %}{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
+    {%- unless splash_streams_page -%}
+      <a class="skip-to-content-link button visually-hidden" href="#MainContent">
+        {{ 'accessibility.skip_to_text' | t }}
+      </a>
 
-    {%- if settings.cart_type == 'drawer' -%}
-      {%- render 'cart-drawer' -%}
-    {%- endif -%}
+      {%- if settings.cart_type == 'drawer' -%}
+        {%- render 'cart-drawer' -%}
+      {%- endif -%}
 
-    {% sections 'header-group' %}
+      {% sections 'header-group' %}
+    {%- endunless -%}
 
     <main id="MainContent" class="content-for-layout focus-none" role="main" tabindex="-1">
       {{ content_for_layout }}
     </main>
 
-    {% sections 'footer-group' %}
+    {%- unless splash_streams_page -%}
+      {% sections 'footer-group' %}
+    {%- endunless -%}
 
     <ul hidden>
       <li id="a11y-refresh-page-message">{{ 'accessibility.refresh_page' | t }}</li>
