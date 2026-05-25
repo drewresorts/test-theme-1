@@ -321,6 +321,12 @@
         body.layout-splash-streams .shopify-section {
           margin: 0;
         }
+
+        /* Keep hCaptcha on the splash signup, not a fixed corner badge */
+        body.layout-splash-streams .h-captcha-badge,
+        body.layout-splash-streams .hcaptcha-box {
+          display: none !important;
+        }
       {% endstyle %}
     {%- endif -%}
 

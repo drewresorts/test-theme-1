@@ -3573,6 +3573,16 @@
             "external_new_tab": {
               "label": "Open external link in new tab"
             },
+            "captcha_on_splash": {
+              "label": "Captcha on splash page",
+              "info": "Inline shows verification under the email field on this page (recommended). None uses a normal form submit — only use if hCaptcha is disabled in Shopify admin → Online store → Preferences → Spam protection.",
+              "options__1": {
+                "label": "Show on splash page (inline)"
+              },
+              "options__2": {
+                "label": "No inline captcha (admin must disable hCaptcha)"
+              }
+            },
             "show_spam_disclaimer": {
               "label": "Show spam protection disclaimer",
               "info": "For Shopify newsletter only. Shows text under the form instead of the hCaptcha badge in the corner."
