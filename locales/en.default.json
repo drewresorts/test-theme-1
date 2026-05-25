@@ -398,7 +398,14 @@
       "title": "Account",
       "details": "Account details",
       "view_addresses": "View addresses",
-      "return": "Return to Account details"
+      "return": "Return to Account details",
+      "signed_in_as": "Signed in as",
+      "continue_shopping": "Continue shopping",
+      "nav_aria": "Account navigation",
+      "nav_overview": "Overview",
+      "help": "Help",
+      "returns": "Returns",
+      "no_default_address": "You have not set a default address yet."
     },
     "account_fallback": "Account",
     "activate_account": {
@@ -534,6 +541,26 @@
       "max_characters": "{{ max_chars }} characters max",
       "send_on": "YYYY-MM-DD",
       "send_on_label": "Send on (optional)"
+    }
+  },
+  "splash_streams": {
+    "email": {
+      "error": "Please enter a valid email address.",
+      "success": "Thanks — you're on the list."
+    }
+  },
+  "catalog_splash": {
+    "nav": {
+      "placeholder": "Choose a menu in the theme editor (left column links)."
+    }
+  },
+  "product_splash": {
+    "add_to_cart": "Add To Cart",
+    "sold_out": "Sold out",
+    "added": "Added to cart",
+    "error": "We couldn\u2019t add that to the cart. Please try again.",
+    "nav": {
+      "placeholder": "Choose a menu in the theme editor (left column links)."
     }
   },
   "coming_soon": {

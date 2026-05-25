@@ -752,3 +752,113 @@ li[data-address] > h2 {
 .addresses form > div:nth-of-type(7) + div[id] {
   margin-top: 1.5rem;
 }
+
+/* Account dashboard (main-account) */
+.customer.customer--account-dashboard {
+  max-width: min(120rem, calc(100vw - 3rem));
+  margin: 0 auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  text-align: left;
+}
+
+.customer__account-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem 2rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 0.1rem solid rgba(var(--color-foreground), 0.08);
+}
+
+.customer__account-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.customer__account-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: underline;
+}
+
+.customer__account-email {
+  margin: 0.5rem 0 0;
+  font-size: 1.4rem;
+  opacity: 0.85;
+}
+
+.customer__account-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.2rem;
+  margin-bottom: 2.5rem;
+}
+
+.customer__account-nav-link {
+  padding: 0.6rem 1rem;
+  border-radius: var(--buttons-radius, 0);
+  border: 0.1rem solid rgba(var(--color-foreground), 0.15);
+  text-decoration: none;
+}
+
+.customer__account-nav-link--current {
+  border-color: rgb(var(--color-foreground));
+  font-weight: 600;
+}
+
+.customer__account-nav-count {
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+.customer__account-grid {
+  display: grid;
+  gap: 3rem;
+}
+
+@media screen and (min-width: 990px) {
+  .customer__account-grid {
+    grid-template-columns: minmax(0, 1fr) 34rem;
+    align-items: start;
+  }
+}
+
+.customer__account-sidebar .button {
+  margin-top: 1.5rem;
+}
+
+.customer__account-address {
+  margin-top: 1rem;
+}
+
+/* Order line item thumbnails */
+.order-details__product-cell {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.2rem;
+}
+
+.order-details__product-thumb {
+  flex: 0 0 auto;
+  width: 6rem;
+  max-width: 22vw;
+}
+
+.order-details__product-thumb img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: calc(var(--media-radius) - var(--media-border-width));
+  border: var(--media-border-width) solid rgba(var(--color-foreground), 0.06);
+}
+
+.order-details__product-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}

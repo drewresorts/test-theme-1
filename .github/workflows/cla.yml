@@ -1,3 +1,11 @@
+# Verifies contributors against https://cla.shopify.com/ (Shopify CLA action).
+# After signing, commenting a phrase that includes "signed" (e.g. "I have signed the CLA!")
+# re-runs this workflow on the PR.
+#
+# Repository admins: add a CLA_TOKEN secret (Settings → Secrets and variables → Actions).
+# Without it, the CLA job fails with "Input required and not supplied: cla-token".
+# See https://github.com/Shopify/shopify-cla-action
+
 name: Contributor License Agreement (CLA)
 
 on:
@@ -9,12 +17,21 @@ on:
 jobs:
   cla:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      pull-requests: write
     if: |
-      (github.event.issue.pull_request 
+      (
+        github.event_name == 'issue_comment'
+        && github.event.issue.pull_request
         && !github.event.issue.pull_request.merged_at
-        && contains(github.event.comment.body, 'signed')
-      ) 
-      || (github.event.pull_request && !github.event.pull_request.merged)
+        && contains(toLower(github.event.comment.body), 'signed')
+      )
+      || (
+        github.event_name == 'pull_request_target'
+        && github.event.pull_request
+        && !github.event.pull_request.merged
+      )
     steps:
       - uses: Shopify/shopify-cla-action@v1
         with:

@@ -7,6 +7,7 @@
   assign overlay_color = section.settings.overlay_color | default: '#000000'
 
   assign stream_blocks = section.blocks | where: 'type', 'stream'
+  assign email_blocks = section.blocks | where: 'type', 'email_signup'
   assign splash_menu = section.settings.menu
 -%}
 
@@ -154,7 +155,31 @@
       </ul>
       </nav>
     </div>
+
+    {%- for block in email_blocks -%}
+      {%- if block.settings.position == 'below_logo' -%}
+        <div
+          class="splash-streams__signup splash-streams__signup--below-logo"
+          {{ block.shopify_attributes }}
+          data-splash-email-signup
+        >
+          {%- render 'splash-email-signup', block: block, section: section -%}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
   </div>
+
+  {%- for block in email_blocks -%}
+    {%- unless block.settings.position == 'below_logo' -%}
+      <div
+        class="splash-streams__signup splash-streams__signup--bottom"
+        {{ block.shopify_attributes }}
+        data-splash-email-signup
+      >
+        {%- render 'splash-email-signup', block: block, section: section -%}
+      </div>
+    {%- endunless -%}
+  {%- endfor -%}
 
   {%- if stream_blocks.size > 0 -%}
     <p class="splash-streams__key-hint" aria-live="polite">Change stream with arrow keys</p>
@@ -670,6 +695,146 @@
     transition: opacity 0.15s ease;
   }
 
+  .splash-streams__signup {
+    z-index: 14;
+    pointer-events: auto;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    color: #fff;
+    text-shadow:
+      0 0 10px #000,
+      0 1px 3px #000;
+  }
+
+  .splash-streams__signup--bottom {
+    position: fixed;
+    bottom: max(1.25rem, env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(92vw, 32rem);
+    padding: 0 1rem;
+  }
+
+  @media (min-width: 750px) {
+    .splash-streams__signup--bottom {
+      bottom: max(2rem, 6vh);
+    }
+
+    .splash-streams:has(.splash-streams__key-hint) .splash-streams__signup--bottom {
+      bottom: max(3.25rem, 8vh);
+    }
+  }
+
+  .splash-streams__signup--below-logo {
+    position: relative;
+    width: min(92vw, 32rem);
+    margin-top: clamp(0.75rem, 2vh, 1.5rem);
+  }
+
+  .splash-streams--nav-open .splash-streams__signup {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+
+  .splash-streams__signup-heading {
+    margin: 0 0 0.35rem;
+    font-size: clamp(0.85rem, 2.5vw, 1.05rem);
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+  }
+
+  .splash-streams__signup-text {
+    margin: 0 0 0.75rem;
+    font-size: clamp(0.7rem, 2vw, 0.85rem);
+    font-weight: 400;
+    line-height: 1.35;
+    opacity: 0.9;
+  }
+
+  .splash-streams__signup--lowercase .splash-streams__signup-heading,
+  .splash-streams__signup--lowercase .splash-streams__signup-text,
+  .splash-streams__signup--lowercase .splash-streams__email-field__input,
+  .splash-streams__signup--lowercase .splash-streams__email-field__button {
+    text-transform: lowercase;
+  }
+
+  .splash-streams__email-form {
+    margin: 0;
+  }
+
+  .splash-streams__email-field {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 0;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, #fff 35%, transparent);
+    background: color-mix(in srgb, #000 45%, transparent);
+    backdrop-filter: blur(6px);
+  }
+
+  .splash-streams__email-field__input {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    padding: 0.85rem 1rem;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .splash-streams__email-field__input::placeholder {
+    color: color-mix(in srgb, #fff 55%, transparent);
+    opacity: 1;
+  }
+
+  .splash-streams__email-field__input:focus {
+    outline: 2px solid color-mix(in srgb, #fff 70%, transparent);
+    outline-offset: -2px;
+  }
+
+  .splash-streams__email-field__button {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 0.85rem 1.15rem;
+    border: 0;
+    border-left: 1px solid color-mix(in srgb, #fff 25%, transparent);
+    background: color-mix(in srgb, #fff 18%, transparent);
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.15s ease;
+  }
+
+  .splash-streams__email-field__button:hover,
+  .splash-streams__email-field__button:focus-visible {
+    background: color-mix(in srgb, #fff 32%, transparent);
+  }
+
+  .splash-streams__email-message {
+    margin: 0.65rem 0 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .splash-streams__email-message--error {
+    color: #ffb4b4;
+  }
+
+  .splash-streams__email-message--success {
+    color: #b8f5c8;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .splash-streams__selfie-shell {
       display: none !important;
@@ -735,13 +900,15 @@
       return null;
     }
 
-    function buildEmbedUrl(videoId) {
+    function isLiveSourceUrl(inputUrl) {
+      return /\/live(\/|$)/i.test(String(inputUrl || ''));
+    }
+
+    function buildEmbedUrl(videoId, sourceUrl) {
       const id = String(videoId).trim();
-      const q = [
+      const common = [
         'autoplay=1',
         'mute=1',
-        'loop=1',
-        'playlist=' + encodeURIComponent(id),
         'controls=0',
         'showinfo=0',
         'rel=0',
@@ -750,9 +917,17 @@
         'playsinline=1',
         'fs=0',
         'disablekb=1',
-      ].join('&');
-      return 'https://www.youtube.com/embed/' + encodeURIComponent(id) + '?' + q;
+      ];
+      // Loop + playlist makes live streams stutter/reload; skip for /live/ URLs.
+      if (!isLiveSourceUrl(sourceUrl)) {
+        common.push('loop=1', 'playlist=' + encodeURIComponent(id));
+      }
+      return 'https://www.youtube.com/embed/' + encodeURIComponent(id) + '?' + common.join('&');
     }
+
+    let currentVideoId = null;
+    let lastLayoutMode = null;
+    let syncLayoutTimer = null;
 
     const ids = streams
       .map((s) => parseYouTubeId(s.url))
@@ -812,16 +987,39 @@
       }
     }
 
+    function streamSourceUrlAt(i) {
+      const entry = streams[i];
+      return entry && typeof entry.url === 'string' ? entry.url : '';
+    }
+
+    function applyYoutubeVideo(videoId, sourceUrl, forceReload) {
+      if (!hasYoutube || !videoId) return;
+      const url = buildEmbedUrl(videoId, sourceUrl);
+      const changingVideo = currentVideoId !== videoId;
+
+      if (!forceReload && !changingVideo && iframe.src && iframe.src.indexOf(videoId) !== -1) {
+        return;
+      }
+
+      currentVideoId = videoId;
+      root.dataset.splashActiveVideo = videoId;
+
+      if (changingVideo && iframe.src && iframe.src !== 'about:blank') {
+        iframe.src = 'about:blank';
+        window.setTimeout(function () {
+          iframe.src = url;
+        }, 30);
+      } else {
+        iframe.src = url;
+      }
+    }
+
     function switchTo(nextIndex) {
       if (!hasYoutube) return;
       if (isMobile() && !root.classList.contains('splash-streams--selfie-fallback')) return;
-      index = (nextIndex + ids.length) % ids.length;
-      const videoId = ids[index];
-      const url = buildEmbedUrl(videoId);
-      iframe.src = 'about:blank';
-      setTimeout(function () {
-        iframe.src = url;
-      }, 30);
+      const newIndex = ((nextIndex % ids.length) + ids.length) % ids.length;
+      index = newIndex;
+      applyYoutubeVideo(ids[index], streamSourceUrlAt(index), false);
     }
 
     function showCameraPrompt() {
@@ -839,6 +1037,18 @@
     function startSelfie() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         return Promise.resolve(false);
+      }
+      if (root.classList.contains('splash-streams--camera-live') && selfieVideo.srcObject) {
+        try {
+          const tracks = selfieVideo.srcObject.getTracks();
+          if (tracks.some(function (t) {
+            return t.readyState === 'live';
+          })) {
+            return Promise.resolve(true);
+          }
+        } catch (e) {
+          // continue to restart camera
+        }
       }
       stopSelfie();
       return navigator.mediaDevices
@@ -872,8 +1082,17 @@
       }
     }
 
-    function syncLayout() {
-      if (isMobile()) {
+    function syncLayoutNow() {
+      const mode = isMobile() ? 'mobile' : 'desktop';
+
+      if (mode === 'mobile') {
+        if (
+          mode === lastLayoutMode &&
+          (root.classList.contains('splash-streams--camera-live') ||
+            root.classList.contains('splash-streams--selfie-fallback'))
+        ) {
+          return;
+        }
         closeNav();
         stopSelfie();
         root.classList.remove('splash-streams--selfie-fallback');
@@ -887,16 +1106,27 @@
           }
         });
       } else {
+        if (mode === lastLayoutMode && currentVideoId && iframe.dataset.splashActiveVideo) {
+          return;
+        }
         closeNav();
         hideCameraPrompt();
         stopSelfie();
         root.classList.remove('splash-streams--selfie-fallback');
         if (hasYoutube) {
-          switchTo(index);
+          applyYoutubeVideo(ids[index], streamSourceUrlAt(index), false);
         } else {
           iframe.src = 'about:blank';
+          currentVideoId = null;
         }
       }
+
+      lastLayoutMode = mode;
+    }
+
+    function syncLayout() {
+      window.clearTimeout(syncLayoutTimer);
+      syncLayoutTimer = window.setTimeout(syncLayoutNow, 200);
     }
 
     function onKeyDown(e) {
@@ -950,14 +1180,8 @@
       closeNav();
       root.classList.add('splash-streams--selfie-fallback');
       stopSelfie();
-
       index = ((nextIndex % ids.length) + ids.length) % ids.length;
-      const videoId = ids[index];
-      const url = buildEmbedUrl(videoId);
-      iframe.src = 'about:blank';
-      setTimeout(function () {
-        iframe.src = url;
-      }, 30);
+      applyYoutubeVideo(ids[index], streamSourceUrlAt(index), true);
     }
 
     root.addEventListener(
@@ -1116,6 +1340,64 @@
           "default": "https://www.youtube.com/watch?v=erBoOFKTH4E"
         }
       ]
+    },
+    {
+      "type": "email_signup",
+      "name": "t:splash_streams_page.section.blocks.email_signup.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "position",
+          "label": "t:splash_streams_page.section.blocks.email_signup.settings.position.label",
+          "default": "bottom",
+          "options": [
+            {
+              "value": "bottom",
+              "label": "t:splash_streams_page.section.blocks.email_signup.settings.position.options__1.label"
+            },
+            {
+              "value": "below_logo",
+              "label": "t:splash_streams_page.section.blocks.email_signup.settings.position.options__2.label"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "t:splash_streams_page.section.blocks.email_signup.settings.heading.label",
+          "default": "Stay in the loop"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "t:splash_streams_page.section.blocks.email_signup.settings.text.label"
+        },
+        {
+          "type": "text",
+          "id": "placeholder",
+          "label": "t:splash_streams_page.section.blocks.email_signup.settings.placeholder.label",
+          "default": "Email"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "t:splash_streams_page.section.blocks.email_signup.settings.button_label.label",
+          "default": "Subscribe"
+        },
+        {
+          "type": "text",
+          "id": "success_message",
+          "label": "t:splash_streams_page.section.blocks.email_signup.settings.success_message.label",
+          "default": "Thanks — you're on the list."
+        },
+        {
+          "type": "checkbox",
+          "id": "lowercase_text",
+          "label": "t:splash_streams_page.section.blocks.email_signup.settings.lowercase_text.label",
+          "default": true
+        }
+      ]
     }
   ],
   "presets": [
@@ -1123,7 +1405,8 @@
       "name": "Splash streams",
       "blocks": [
         { "type": "stream" },
-        { "type": "stream" }
+        { "type": "stream" },
+        { "type": "email_signup" }
       ]
     }
   ]
