@@ -546,7 +546,8 @@
   "splash_streams": {
     "email": {
       "error": "Please enter a valid email address.",
-      "success": "Thanks — you're on the list."
+      "success": "Thanks — you're on the list.",
+      "captcha": "Sign-up was blocked by spam protection. Tap the email field, wait a moment, then try again."
     }
   },
   "catalog_splash": {

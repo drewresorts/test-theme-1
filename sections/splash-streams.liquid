@@ -181,6 +181,13 @@
     {%- endunless -%}
   {%- endfor -%}
 
+  <script type="application/json" data-splash-streams-strings>
+    {
+      "emailError": {{ 'splash_streams.email.error' | t | json }},
+      "emailCaptcha": {{ 'splash_streams.email.captcha' | t | json }}
+    }
+  </script>
+
   {%- if stream_blocks.size > 0 -%}
     <p class="splash-streams__key-hint" aria-live="polite">Change stream with arrow keys</p>
   {%- endif -%}
@@ -835,6 +842,41 @@
     color: #b8f5c8;
   }
 
+  .splash-streams__email-form-panel[hidden],
+  .splash-streams__email-success-panel[hidden] {
+    display: none !important;
+  }
+
+  .splash-streams__email-success-panel {
+    min-height: 3.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .splash-streams__email-message--standalone {
+    margin: 0;
+    font-size: clamp(0.8rem, 2.2vw, 1rem);
+    letter-spacing: 0.03em;
+  }
+
+  .splash-streams__email-form-panel,
+  .splash-streams__email-success-panel {
+    transition: opacity 0.25s ease;
+  }
+
+  .splash-streams__email-form-panel.is-fading-out,
+  .splash-streams__email-success-panel.is-fading-out {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .splash-streams__email-form-panel,
+    .splash-streams__email-success-panel {
+      transition: none;
+    }
+  }
+
   .splash-streams__email-disclaimer {
     margin: 0.5rem 0 0;
     font-size: 0.7rem;
@@ -1306,6 +1348,254 @@
     }
 
     syncLayout();
+  })();
+{% endjavascript %}
+
+{% javascript %}
+  (function () {
+    const stringsEl = document.querySelector('[data-splash-streams-strings]');
+    let strings = {};
+    if (stringsEl) {
+      try {
+        strings = JSON.parse(stringsEl.textContent || '{}');
+      } catch (e) {
+        strings = {};
+      }
+    }
+
+    const genericError = strings.emailError || 'Please enter a valid email address.';
+    const captchaError =
+      strings.emailCaptcha ||
+      'Sign-up was blocked by spam protection. Please try again in a moment.';
+
+    const SPLASH_EMAIL_RESET_MS = 5000;
+
+    function showSplashEmailError(errorEl, message) {
+      if (!errorEl) return;
+      errorEl.hidden = false;
+      errorEl.textContent = message;
+    }
+
+    function showSplashEmailSuccessSequence(root) {
+      const formPanel = root.querySelector('[data-splash-email-form-panel]');
+      const successPanel = root.querySelector('[data-splash-email-success-panel]');
+      const successMessage = successPanel && successPanel.querySelector('[role="status"]');
+      const errorEl = root.querySelector('[data-splash-email-error]');
+      if (!formPanel || !successPanel) return;
+
+      if (errorEl) {
+        errorEl.hidden = true;
+        errorEl.textContent = '';
+      }
+
+      formPanel.hidden = true;
+      successPanel.hidden = false;
+      if (successMessage) {
+        successMessage.focus({ preventScroll: true });
+      }
+
+      window.clearTimeout(root.splashEmailResetTimer);
+      root.splashEmailResetTimer = window.setTimeout(function () {
+        successPanel.classList.add('is-fading-out');
+        window.setTimeout(function () {
+          successPanel.hidden = true;
+          successPanel.classList.remove('is-fading-out');
+          formPanel.hidden = false;
+          formPanel.classList.remove('is-fading-out');
+          root.removeAttribute('data-splash-email-just-success');
+
+          const form = formPanel.querySelector('form');
+          if (form) {
+            form.reset();
+          }
+          const emailInput = formPanel.querySelector('input[type="email"]');
+          if (emailInput) {
+            emailInput.value = '';
+            emailInput.removeAttribute('aria-describedby');
+            emailInput.removeAttribute('aria-invalid');
+          }
+
+          const submitBtn = formPanel.querySelector('[type="submit"]');
+          if (submitBtn) {
+            submitBtn.disabled = false;
+          }
+        }, 250);
+      }, SPLASH_EMAIL_RESET_MS);
+    }
+
+    function splashEmailResponseIsSuccess(html, blockId) {
+      if (!html) return false;
+      if (html.indexOf('data-splash-email-just-success') !== -1) return true;
+      if (blockId && html.indexOf('SplashEmailSuccess-' + blockId) !== -1) return true;
+      if (html.indexOf('newsletter-form__message--success') !== -1) return true;
+      if (html.indexOf('coming-soon__form-message--success') !== -1) return true;
+      if (html.indexOf('splash-streams__email-message--success') !== -1) return true;
+      return false;
+    }
+
+    function splashEmailResponseIsChallenge(html, responseUrl) {
+      if (responseUrl && responseUrl.indexOf('/challenge') !== -1) return true;
+      if (!html) return false;
+      return (
+        html.indexOf('shopify-challenge') !== -1 ||
+        html.indexOf('challenge__container') !== -1 ||
+        (html.indexOf('h-captcha') !== -1 && html.indexOf('challenge') !== -1)
+      );
+    }
+
+    function splashEmailResponseIsValidationError(html, status) {
+      if (status === 422) return true;
+      if (!html) return false;
+      if (html.indexOf('splash-streams__email-message--error') !== -1) return true;
+      if (html.indexOf('newsletter-form__message') !== -1 && html.indexOf('icon-error') !== -1) {
+        return true;
+      }
+      return false;
+    }
+
+    function wireSplashEmailCaptcha(form) {
+      if (!form || form.dataset.splashEmailCaptchaWired === 'true') return;
+      if (!(window.Shopify && window.Shopify.captcha && typeof window.Shopify.captcha.protect === 'function')) {
+        return;
+      }
+
+      form.dataset.splashEmailCaptchaWired = 'true';
+      window.Shopify.captcha.protect(form, function () {});
+
+      const emailInput = form.querySelector('input[type="email"]');
+      if (emailInput) {
+        emailInput.addEventListener(
+          'focus',
+          function () {
+            window.Shopify.captcha.protect(form, function () {});
+          },
+          { once: true }
+        );
+      }
+    }
+
+    function postSplashEmailForm(form) {
+      const formAction = form.getAttribute('action') || '/contact';
+
+      return fetch(formAction, {
+        method: 'POST',
+        body: new FormData(form),
+        credentials: 'same-origin',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+      }).then(function (response) {
+        return response.text().then(function (html) {
+          return {
+            status: response.status,
+            ok: response.ok,
+            html: html,
+            url: response.url || '',
+          };
+        });
+      });
+    }
+
+    function submitSplashEmailForm(form, root, blockId, errorEl, submitBtn) {
+      function runPost() {
+        postSplashEmailForm(form)
+          .then(function (result) {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+            }
+
+            if (splashEmailResponseIsChallenge(result.html, result.url)) {
+              showSplashEmailError(errorEl, captchaError);
+              return;
+            }
+
+            if (splashEmailResponseIsSuccess(result.html, blockId)) {
+              showSplashEmailSuccessSequence(root);
+              return;
+            }
+
+            if (splashEmailResponseIsValidationError(result.html, result.status)) {
+              showSplashEmailError(errorEl, genericError);
+              return;
+            }
+
+            if (result.ok) {
+              showSplashEmailSuccessSequence(root);
+              return;
+            }
+
+            if (result.status === 400) {
+              showSplashEmailError(errorEl, captchaError);
+              return;
+            }
+
+            showSplashEmailError(errorEl, genericError);
+          })
+          .catch(function () {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+            }
+            showSplashEmailError(errorEl, genericError);
+          });
+      }
+
+      if (window.Shopify && window.Shopify.captcha && typeof window.Shopify.captcha.protect === 'function') {
+        window.Shopify.captcha.protect(form, runPost);
+      } else {
+        runPost();
+      }
+    }
+
+    function initSplashEmailForm(root) {
+      if (!root) return;
+
+      const formPanel = root.querySelector('[data-splash-email-form-panel]');
+      const form = formPanel && formPanel.querySelector('form.splash-streams__email-form');
+      if (!form || form.dataset.splashEmailBound === 'true') return;
+      form.dataset.splashEmailBound = 'true';
+
+      const blockId = root.getAttribute('data-splash-email-block-id');
+      const errorEl = root.querySelector('[data-splash-email-error]');
+
+      wireSplashEmailCaptcha(form);
+
+      if (root.hasAttribute('data-splash-email-just-success')) {
+        showSplashEmailSuccessSequence(root);
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        if (errorEl) {
+          errorEl.hidden = true;
+          errorEl.textContent = '';
+        }
+
+        const submitBtn = form.querySelector('[type="submit"]');
+        if (submitBtn) {
+          submitBtn.disabled = true;
+        }
+
+        submitSplashEmailForm(form, root, blockId, errorEl, submitBtn);
+      });
+    }
+
+    function initAllSplashEmailSignups(scope) {
+      const container = scope || document;
+      container.querySelectorAll('[data-splash-email-root]').forEach(initSplashEmailForm);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () {
+        initAllSplashEmailSignups();
+      });
+    } else {
+      initAllSplashEmailSignups();
+    }
+
+    document.addEventListener('shopify:section:load', function (event) {
+      initAllSplashEmailSignups(event.target);
+    });
   })();
 {% endjavascript %}
 
