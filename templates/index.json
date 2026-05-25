@@ -12,6 +12,18 @@
     "splash_streams_jYPmmR": {
       "type": "splash-streams",
       "blocks": {
+        "email_signup_8b3nXh": {
+          "type": "email_signup",
+          "settings": {
+            "position": "bottom",
+            "heading": "",
+            "text": "",
+            "placeholder": "Email",
+            "button_label": "Subscribe",
+            "success_message": "Thanks — you're on the list.",
+            "lowercase_text": true
+          }
+        },
         "stream_jqHxD6": {
           "type": "stream",
           "settings": {
@@ -26,6 +38,7 @@
         }
       },
       "block_order": [
+        "email_signup_8b3nXh",
         "stream_jqHxD6",
         "stream_cqRFbW"
       ],
