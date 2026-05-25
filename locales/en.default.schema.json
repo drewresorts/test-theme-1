@@ -1093,8 +1093,36 @@
         "logo_help": {
           "content": "Edit your logo in [theme settings](/editor?context=theme&category=logo)"
         },
+        "header__logo": {
+          "content": "Logo"
+        },
+        "logo_image": {
+          "label": "Logo image",
+          "info": "Overrides the theme logo for this header. Leave empty to use Theme settings → Logo."
+        },
+        "logo_width": {
+          "label": "Logo width",
+          "info": "Applies when a logo image is set above. Otherwise the theme logo width is used."
+        },
+        "mobile_logo": {
+          "label": "Mobile logo",
+          "info": "Optional. Shown below 750px when different from the desktop logo."
+        },
+        "mobile_logo_width": {
+          "label": "Mobile logo width",
+          "info": "Applies when a mobile logo image is set."
+        },
+        "logo_link": {
+          "label": "Logo link",
+          "info": "Where the logo goes when clicked. Defaults to the home page."
+        },
+        "logo_alt": {
+          "label": "Logo alt text",
+          "info": "Accessibility label. Leave blank to use the image alt text or shop name."
+        },
         "logo_position": {
           "label": "Logo position",
+          "info": "Position of the logo in the header layout."
           "options__1": {
             "label": "Middle left"
           },
