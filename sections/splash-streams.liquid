@@ -835,7 +835,40 @@
     color: #b8f5c8;
   }
 
+  .splash-streams__email-form-panel[hidden],
+  .splash-streams__email-success-panel[hidden] {
+    display: none !important;
+  }
+
+  .splash-streams__email-success-panel {
+    min-height: 3.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .splash-streams__email-message--standalone {
+    margin: 0;
+    font-size: clamp(0.8rem, 2.2vw, 1rem);
+    letter-spacing: 0.03em;
+  }
+
+  .splash-streams__email-form-panel,
+  .splash-streams__email-success-panel {
+    transition: opacity 0.25s ease;
+  }
+
+  .splash-streams__email-form-panel.is-fading-out,
+  .splash-streams__email-success-panel.is-fading-out {
+    opacity: 0;
+  }
+
   @media (prefers-reduced-motion: reduce) {
+    .splash-streams__email-form-panel,
+    .splash-streams__email-success-panel {
+      transition: none;
+    }
+
     .splash-streams__selfie-shell {
       display: none !important;
     }
@@ -1216,6 +1249,68 @@
     }
 
     syncLayout();
+
+    function initSplashEmailSignup(root) {
+      if (!root || !root.hasAttribute('data-splash-email-just-success')) return;
+
+      const formPanel = root.querySelector('[data-splash-email-form-panel]');
+      const successPanel = root.querySelector('[data-splash-email-success-panel]');
+      const successMessage = root.querySelector('[data-splash-email-success-panel] [role="status"]');
+      if (!formPanel || !successPanel) return;
+
+      const resetDelayMs = 5000;
+
+      formPanel.hidden = true;
+      successPanel.hidden = false;
+      if (successMessage) {
+        successMessage.focus({ preventScroll: true });
+      }
+
+      window.setTimeout(function () {
+        successPanel.classList.add('is-fading-out');
+        window.setTimeout(function () {
+          successPanel.hidden = true;
+          successPanel.classList.remove('is-fading-out');
+          formPanel.hidden = false;
+          formPanel.classList.remove('is-fading-out');
+          root.removeAttribute('data-splash-email-just-success');
+
+          const form = formPanel.querySelector('form');
+          if (form) {
+            form.reset();
+          }
+          const emailInput = formPanel.querySelector('input[type="email"]');
+          if (emailInput) {
+            emailInput.value = '';
+            emailInput.removeAttribute('aria-describedby');
+            emailInput.removeAttribute('aria-invalid');
+          }
+
+          if (window.history && window.history.replaceState) {
+            try {
+              const url = new URL(window.location.href);
+              if (url.hash) {
+                url.hash = '';
+                window.history.replaceState(null, '', url.pathname + url.search);
+              }
+            } catch (e) {
+              /* ignore */
+            }
+          }
+        }, 250);
+      }, resetDelayMs);
+    }
+
+    function initAllSplashEmailSignups() {
+      document.querySelectorAll('[data-splash-email-root][data-splash-email-just-success]').forEach(initSplashEmailSignup);
+    }
+
+    initAllSplashEmailSignups();
+    document.addEventListener('shopify:section:load', function (event) {
+      const section = event.target;
+      if (!section) return;
+      section.querySelectorAll('[data-splash-email-root][data-splash-email-just-success]').forEach(initSplashEmailSignup);
+    });
   })();
 {% endjavascript %}
 

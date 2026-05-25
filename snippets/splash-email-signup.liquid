@@ -15,9 +15,21 @@
   if block.settings.lowercase_text
     assign lowercase_class = ' splash-streams__signup--lowercase'
   endif
+
+  if block.settings.success_message != blank
+    assign signup_success_text = block.settings.success_message
+  else
+    assign signup_success_text = 'splash_streams.email.success' | t
+  endif
 -%}
 
-<div class="splash-streams__email-signup{{ lowercase_class }}">
+<div
+  class="splash-streams__email-signup{{ lowercase_class }}"
+  data-splash-email-root
+  {% if form.posted_successfully? %}
+    data-splash-email-just-success
+  {% endif %}
+>
   {%- if signup_heading != blank -%}
     <p class="splash-streams__signup-heading">{{ signup_heading | escape }}</p>
   {%- endif -%}
@@ -26,62 +38,70 @@
     <div class="splash-streams__signup-text rte">{{ signup_text }}</div>
   {%- endif -%}
 
-  {%- assign splash_email_form_id = 'SplashEmail-' | append: block.id -%}
-  {% form 'customer', class: 'splash-streams__email-form', id: splash_email_form_id %}
-    <input type="hidden" name="contact[tags]" value="newsletter">
-    <div class="splash-streams__email-field">
-      <input
-        id="SplashEmailInput-{{ block.id }}"
-        class="splash-streams__email-field__input"
-        type="email"
-        name="contact[email]"
-        value="{{ form.email }}"
-        aria-required="true"
-        autocorrect="off"
-        autocapitalize="off"
-        autocomplete="email"
-        placeholder="{{ signup_placeholder | escape }}"
-        required
-        {% if form.errors %}
-          aria-invalid="true"
-          aria-describedby="SplashEmailError-{{ block.id }}"
-        {% elsif form.posted_successfully? %}
-          aria-describedby="SplashEmailSuccess-{{ block.id }}"
-        {% endif %}
-      >
-      <button
-        type="submit"
-        class="splash-streams__email-field__button"
-        name="commit"
-        aria-label="{{ signup_button | escape }}"
-      >
-        {{ signup_button | escape }}
-      </button>
-    </div>
+  <div
+    class="splash-streams__email-form-panel"
+    data-splash-email-form-panel
+    {% if form.posted_successfully? %}
+      hidden
+    {% endif %}
+  >
+    {%- assign splash_email_form_id = 'SplashEmail-' | append: block.id -%}
+    {% form 'customer', class: 'splash-streams__email-form', id: splash_email_form_id %}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <div class="splash-streams__email-field">
+        <input
+          id="SplashEmailInput-{{ block.id }}"
+          class="splash-streams__email-field__input"
+          type="email"
+          name="contact[email]"
+          value="{{ form.email }}"
+          aria-required="true"
+          autocorrect="off"
+          autocapitalize="off"
+          autocomplete="email"
+          placeholder="{{ signup_placeholder | escape }}"
+          required
+          {% if form.errors %}
+            aria-invalid="true"
+            aria-describedby="SplashEmailError-{{ block.id }}"
+          {% endif %}
+        >
+        <button
+          type="submit"
+          class="splash-streams__email-field__button"
+          name="commit"
+          aria-label="{{ signup_button | escape }}"
+        >
+          {{ signup_button | escape }}
+        </button>
+      </div>
 
-    {%- if form.errors -%}
-      <p class="splash-streams__email-message splash-streams__email-message--error" id="SplashEmailError-{{ block.id }}" role="alert">
-        {%- if form.errors.messages.email != blank -%}
-          {{ form.errors.messages.email }}
-        {%- else -%}
-          {{ 'splash_streams.email.error' | t }}
-        {%- endif -%}
-      </p>
-    {%- endif -%}
+      {%- if form.errors -%}
+        <p class="splash-streams__email-message splash-streams__email-message--error" id="SplashEmailError-{{ block.id }}" role="alert">
+          {%- if form.errors.messages.email != blank -%}
+            {{ form.errors.messages.email }}
+          {%- else -%}
+            {{ 'splash_streams.email.error' | t }}
+          {%- endif -%}
+        </p>
+      {%- endif -%}
+    {% endform %}
+  </div>
 
-    {%- if form.posted_successfully? -%}
-      <p
-        class="splash-streams__email-message splash-streams__email-message--success"
-        id="SplashEmailSuccess-{{ block.id }}"
-        role="status"
-        tabindex="-1"
-      >
-        {%- if block.settings.success_message != blank -%}
-          {{ block.settings.success_message | escape }}
-        {%- else -%}
-          {{ 'splash_streams.email.success' | t }}
-        {%- endif -%}
-      </p>
-    {%- endif -%}
-  {% endform %}
+  <div
+    class="splash-streams__email-success-panel"
+    data-splash-email-success-panel
+    {% unless form.posted_successfully? %}
+      hidden
+    {% endunless %}
+  >
+    <p
+      class="splash-streams__email-message splash-streams__email-message--success splash-streams__email-message--standalone"
+      id="SplashEmailSuccess-{{ block.id }}"
+      role="status"
+      tabindex="-1"
+    >
+      {{ signup_success_text | escape }}
+    </p>
+  </div>
 </div>
