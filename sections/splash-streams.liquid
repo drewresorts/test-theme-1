@@ -835,6 +835,37 @@
     color: #b8f5c8;
   }
 
+  .splash-streams__email-disclaimer {
+    margin: 0.5rem 0 0;
+    font-size: 0.7rem;
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.55);
+    text-align: center;
+  }
+
+  .splash-streams__email-disclaimer a {
+    color: inherit;
+  }
+
+  .splash-streams__email-external {
+    display: flex;
+    justify-content: center;
+  }
+
+  .splash-streams__email-external-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    min-width: 8rem;
+  }
+
+  .splash-streams__email-embed {
+    width: 100%;
+    max-width: 28rem;
+    margin: 0 auto;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .splash-streams__selfie-shell {
       display: none !important;
@@ -1346,6 +1377,51 @@
       "name": "t:splash_streams_page.section.blocks.email_signup.name",
       "limit": 1,
       "settings": [
+        {
+          "type": "select",
+          "id": "signup_type",
+          "label": "t:splash_streams_page.section.blocks.email_signup.settings.signup_type.label",
+          "default": "shopify",
+          "info": "t:splash_streams_page.section.blocks.email_signup.settings.signup_type.info",
+          "options": [
+            {
+              "value": "shopify",
+              "label": "t:splash_streams_page.section.blocks.email_signup.settings.signup_type.options__1.label"
+            },
+            {
+              "value": "embed",
+              "label": "t:splash_streams_page.section.blocks.email_signup.settings.signup_type.options__2.label"
+            },
+            {
+              "value": "external_link",
+              "label": "t:splash_streams_page.section.blocks.email_signup.settings.signup_type.options__3.label"
+            }
+          ]
+        },
+        {
+          "type": "html",
+          "id": "embed_code",
+          "label": "t:splash_streams_page.section.blocks.email_signup.settings.embed_code.label",
+          "info": "t:splash_streams_page.section.blocks.email_signup.settings.embed_code.info"
+        },
+        {
+          "type": "url",
+          "id": "external_url",
+          "label": "t:splash_streams_page.section.blocks.email_signup.settings.external_url.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "external_new_tab",
+          "label": "t:splash_streams_page.section.blocks.email_signup.settings.external_new_tab.label",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_spam_disclaimer",
+          "label": "t:splash_streams_page.section.blocks.email_signup.settings.show_spam_disclaimer.label",
+          "info": "t:splash_streams_page.section.blocks.email_signup.settings.show_spam_disclaimer.info",
+          "default": false
+        },
         {
           "type": "select",
           "id": "position",

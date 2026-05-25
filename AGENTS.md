@@ -22,3 +22,4 @@ This is a **Shopify theme** ("Coming Soon Live") built on **[Shopify Dawn](https
 
 - `shopify theme dev` and `shopify theme push` require authentication to a Shopify store. Without store credentials, linting (`shopify theme check`) is the main local validation.
 - The theme gracefully degrades when no stream URL is configured — it falls back to a poster image or shows nothing, so a working streaming server is not required for development.
+- Splash **email signup** uses Shopify’s `{% form 'customer' %}` when **Signup method** is “Shopify newsletter”. hCaptcha is controlled in the store admin (Online store → Preferences → Spam protection), not in theme Liquid. To avoid captcha/challenge redirects on the splash page, either disable hCaptcha for contact forms in admin, or set the Email signup block to **Custom HTML** or **External link** in the theme editor.
