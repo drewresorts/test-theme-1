@@ -29,7 +29,6 @@
   {%- assign splash_email_form_id = 'SplashEmail-' | append: block.id -%}
   {% form 'customer', class: 'splash-streams__email-form', id: splash_email_form_id %}
     <input type="hidden" name="contact[tags]" value="newsletter">
-    <input type="hidden" name="return_to" value="{{ canonical_url }}">
     <div class="splash-streams__email-field">
       <input
         id="SplashEmailInput-{{ block.id }}"
@@ -75,8 +74,6 @@
         class="splash-streams__email-message splash-streams__email-message--success"
         id="SplashEmailSuccess-{{ block.id }}"
         role="status"
-        tabindex="-1"
-        autofocus
       >
         {%- if block.settings.success_message != blank -%}
           {{ block.settings.success_message | escape }}

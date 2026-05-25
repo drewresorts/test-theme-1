@@ -1086,11 +1086,7 @@
       const mode = isMobile() ? 'mobile' : 'desktop';
 
       if (mode === 'mobile') {
-        if (
-          mode === lastLayoutMode &&
-          (root.classList.contains('splash-streams--camera-live') ||
-            root.classList.contains('splash-streams--selfie-fallback'))
-        ) {
+        if (mode === lastLayoutMode) {
           return;
         }
         closeNav();
