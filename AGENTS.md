@@ -22,4 +22,3 @@ This is a **Shopify theme** ("Coming Soon Live") built on **[Shopify Dawn](https
 
 - `shopify theme dev` and `shopify theme push` require authentication to a Shopify store. Without store credentials, linting (`shopify theme check`) is the main local validation.
 - The theme gracefully degrades when no stream URL is configured — it falls back to a poster image or shows nothing, so a working streaming server is not required for development.
-- Splash **email signup** defaults to **Captcha on splash page → Show on splash page (inline)**: hCaptcha renders under the email field (corner badge hidden on splash layouts), and interactive challenges open in an iframe on the splash page instead of navigating away. Set **No inline captcha** only if hCaptcha is disabled in admin, or use **Custom HTML** / **External link** to avoid Shopify captcha entirely.

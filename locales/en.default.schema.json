@@ -3550,43 +3550,6 @@
         "email_signup": {
           "name": "Email signup",
           "settings": {
-            "signup_type": {
-              "label": "Signup method",
-              "info": "Shopify’s built-in form uses store spam protection (hCaptcha). To remove captcha on the splash page: use Custom HTML or External link, or in Shopify admin go to Online store → Preferences → Spam protection and disable hCaptcha on contact forms.",
-              "options__1": {
-                "label": "Shopify newsletter"
-              },
-              "options__2": {
-                "label": "Custom HTML (no Shopify captcha)"
-              },
-              "options__3": {
-                "label": "External link (no Shopify captcha)"
-              }
-            },
-            "embed_code": {
-              "label": "Custom HTML",
-              "info": "Paste your email app embed code (Klaviyo, Mailchimp, Shopify Forms, etc.). Used when Signup method is Custom HTML."
-            },
-            "external_url": {
-              "label": "External signup URL"
-            },
-            "external_new_tab": {
-              "label": "Open external link in new tab"
-            },
-            "captcha_on_splash": {
-              "label": "Captcha on splash page",
-              "info": "Inline shows verification under the email field on this page (recommended). None uses a normal form submit — only use if hCaptcha is disabled in Shopify admin → Online store → Preferences → Spam protection.",
-              "options__1": {
-                "label": "Show on splash page (inline)"
-              },
-              "options__2": {
-                "label": "No inline captcha (admin must disable hCaptcha)"
-              }
-            },
-            "show_spam_disclaimer": {
-              "label": "Show spam protection disclaimer",
-              "info": "For Shopify newsletter only. Shows text under the form instead of the hCaptcha badge in the corner."
-            },
             "position": {
               "label": "Position",
               "options__1": {
