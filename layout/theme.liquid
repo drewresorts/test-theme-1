@@ -296,13 +296,15 @@
     {%- endif -%}
 
     {%- liquid
-      assign splash_streams_page = false
-      if template.name == 'page' and template.suffix == 'splash-streams'
-        assign splash_streams_page = true
+      assign hide_store_chrome = false
+      if template.name == 'index'
+        assign hide_store_chrome = true
+      elsif template.name == 'page' and template.suffix == 'splash-streams'
+        assign hide_store_chrome = true
       endif
     -%}
 
-    {%- if splash_streams_page -%}
+    {%- if hide_store_chrome -%}
       {% style %}
         body.layout-splash-streams {
           display: block;
@@ -329,8 +331,8 @@
     </script>
   </head>
 
-  <body class="gradient{% if splash_streams_page %} layout-splash-streams{% endif %}{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
-    {%- unless splash_streams_page -%}
+  <body class="gradient{% if hide_store_chrome %} layout-splash-streams{% endif %}{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
+    {%- unless hide_store_chrome -%}
       <a class="skip-to-content-link button visually-hidden" href="#MainContent">
         {{ 'accessibility.skip_to_text' | t }}
       </a>
@@ -346,7 +348,7 @@
       {{ content_for_layout }}
     </main>
 
-    {%- unless splash_streams_page -%}
+    {%- unless hide_store_chrome -%}
       {% sections 'footer-group' %}
     {%- endunless -%}
 
