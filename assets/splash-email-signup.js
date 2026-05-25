@@ -1,61 +1,70 @@
 /**
- * Splash homepage email signup — stays on page (no navigation to /challenge).
+ * Splash homepage email signup — captcha in overlay on splash, no full-page redirect.
  */
 (function () {
   'use strict';
 
-  var STRINGS = { error: 'Please enter a valid email address.', captcha: 'Complete verification, then tap Continue.' };
-  var el = document.querySelector('[data-splash-streams-strings]');
-  if (el) {
+  var STRINGS = {
+    error: 'Please enter a valid email address.',
+    captcha: 'Complete verification in the box, then tap Continue.',
+  };
+
+  var stringsEl = document.querySelector('[data-splash-streams-strings]');
+  if (stringsEl) {
     try {
-      var parsed = JSON.parse(el.textContent || '{}');
+      var parsed = JSON.parse(stringsEl.textContent || '{}');
       if (parsed.emailError) STRINGS.error = parsed.emailError;
       if (parsed.emailCaptcha) STRINGS.captcha = parsed.emailCaptcha;
     } catch (e) {
-      /* use defaults */
+      /* defaults */
     }
   }
 
-  function qs(root, sel) {
+  function $(root, sel) {
     return root.querySelector(sel);
   }
 
-  function showError(errorEl, msg) {
-    if (!errorEl) return;
-    errorEl.hidden = false;
-    errorEl.textContent = msg;
+  function showError(el, msg) {
+    if (!el) return;
+    el.hidden = false;
+    el.textContent = msg;
   }
 
-  function hideError(errorEl) {
-    if (!errorEl) return;
-    errorEl.hidden = true;
-    errorEl.textContent = '';
+  function hideError(el) {
+    if (!el) return;
+    el.hidden = true;
+    el.textContent = '';
   }
 
-  function hideOverlay(root) {
-    var overlay = qs(root, '[data-splash-email-challenge-overlay]');
-    var frame = qs(root, '[data-splash-email-challenge-frame]');
-    if (overlay) overlay.hidden = true;
+  function hideChallenge(root) {
+    var overlay = $(root, '[data-splash-email-challenge-overlay]');
+    var frame = $(root, '[data-splash-email-challenge-frame]');
+    if (overlay) {
+      overlay.hidden = true;
+      overlay.setAttribute('aria-hidden', 'true');
+    }
     if (frame) frame.removeAttribute('src');
     document.documentElement.classList.remove('splash-streams--challenge-open');
   }
 
-  function showOverlay(root, form) {
-    var overlay = qs(root, '[data-splash-email-challenge-overlay]');
-    var frame = qs(root, '[data-splash-email-challenge-frame]');
+  function showChallenge(root, form) {
+    var overlay = $(root, '[data-splash-email-challenge-overlay]');
+    var frame = $(root, '[data-splash-email-challenge-frame]');
     if (!overlay || !frame) return;
+
     var formId = form.id || 'contact_form';
     overlay.hidden = false;
+    overlay.setAttribute('aria-hidden', 'false');
     document.documentElement.classList.add('splash-streams--challenge-open');
     frame.src = '/challenge#' + encodeURIComponent(formId);
   }
 
   function showSuccess(root) {
-    var formPanel = qs(root, '[data-splash-email-form-panel]');
-    var successPanel = qs(root, '[data-splash-email-success-panel]');
+    var formPanel = $(root, '[data-splash-email-form-panel]');
+    var successPanel = $(root, '[data-splash-email-success-panel]');
     var status = successPanel && successPanel.querySelector('[role="status"]');
-    hideOverlay(root);
-    hideError(qs(root, '[data-splash-email-error]'));
+    hideChallenge(root);
+    hideError($(root, '[data-splash-email-error]'));
     if (formPanel) formPanel.hidden = true;
     if (successPanel) {
       successPanel.hidden = false;
@@ -91,11 +100,11 @@
     });
   }
 
-  function afterPost(result, root, form, blockId, errorEl, submitBtn) {
+  function handleResult(result, root, form, blockId, errorEl, submitBtn) {
     if (submitBtn) submitBtn.disabled = false;
 
     if (isChallengeHtml(result.html, result.url) || result.status === 400) {
-      showOverlay(root, form);
+      showChallenge(root, form);
       showError(errorEl, STRINGS.captcha);
       return;
     }
@@ -117,7 +126,7 @@
     function run() {
       postForm(form)
         .then(function (result) {
-          afterPost(result, root, form, blockId, errorEl, submitBtn);
+          handleResult(result, root, form, blockId, errorEl, submitBtn);
         })
         .catch(function () {
           if (submitBtn) submitBtn.disabled = false;
@@ -133,22 +142,22 @@
   }
 
   function bindRoot(root) {
-    var form = qs(root, 'form.splash-streams__email-form');
+    var form = $(root, 'form.splash-streams__email-form');
     if (!form || form.dataset.splashEmailBound === '1') return;
     form.dataset.splashEmailBound = '1';
 
     var blockId = root.getAttribute('data-splash-email-block-id');
-    var errorEl = qs(root, '[data-splash-email-error]');
+    var errorEl = $(root, '[data-splash-email-error]');
     var submitBtn = form.querySelector('[type="submit"]');
 
     if (window.Shopify && window.Shopify.captcha && typeof window.Shopify.captcha.protect === 'function') {
       window.Shopify.captcha.protect(form, function () {});
     }
 
-    var closeBtn = qs(root, '[data-splash-email-challenge-close]');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', function () {
-        hideOverlay(root);
+    var doneBtn = $(root, '[data-splash-email-challenge-done]');
+    if (doneBtn) {
+      doneBtn.addEventListener('click', function () {
+        hideChallenge(root);
         hideError(errorEl);
         if (submitBtn) {
           submitBtn.disabled = true;
@@ -161,13 +170,17 @@
       showSuccess(root);
     }
 
-    form.addEventListener('submit', function (ev) {
-      ev.preventDefault();
-      ev.stopPropagation();
-      hideError(errorEl);
-      if (submitBtn) submitBtn.disabled = true;
-      submit(root, form, blockId, errorEl, submitBtn);
-    });
+    form.addEventListener(
+      'submit',
+      function (ev) {
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+        hideError(errorEl);
+        if (submitBtn) submitBtn.disabled = true;
+        submit(root, form, blockId, errorEl, submitBtn);
+      },
+      true
+    );
   }
 
   function init(scope) {
@@ -175,9 +188,7 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () {
-      init();
-    });
+    document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }

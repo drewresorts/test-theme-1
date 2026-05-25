@@ -546,7 +546,11 @@
   "splash_streams": {
     "email": {
       "error": "Please enter a valid email address.",
-      "success": "Thanks — you're on the list."
+      "success": "Thanks — you're on the list.",
+      "captcha": "Complete verification in the box, then tap Continue.",
+      "captcha_heading": "To continue, let us know you're not a robot.",
+      "captcha_frame_title": "Verification",
+      "captcha_retry": "Continue"
     }
   },
   "catalog_splash": {
