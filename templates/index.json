@@ -12,18 +12,6 @@
     "splash_streams_jYPmmR": {
       "type": "splash-streams",
       "blocks": {
-        "email_signup_8b3nXh": {
-          "type": "email_signup",
-          "settings": {
-            "position": "bottom",
-            "heading": "",
-            "text": "",
-            "placeholder": "Email",
-            "button_label": "Subscribe",
-            "success_message": "Thanks — you're on the list.",
-            "lowercase_text": true
-          }
-        },
         "stream_TmMwAG": {
           "type": "stream",
           "settings": {
@@ -41,21 +29,33 @@
           "settings": {
             "youtube_url": "https://www.youtube.com/watch?v=erBoOFKTH4E"
           }
+        },
+        "email_signup_8b3nXh": {
+          "type": "email_signup",
+          "settings": {
+            "position": "bottom",
+            "heading": "",
+            "text": "",
+            "placeholder": "Email",
+            "button_label": "Subscribe",
+            "success_message": "Thanks — you're on the list.",
+            "lowercase_text": true
+          }
         }
       },
       "block_order": [
-        "email_signup_8b3nXh",
         "stream_TmMwAG",
         "stream_jqHxD6",
-        "stream_cqRFbW"
+        "stream_cqRFbW",
+        "email_signup_8b3nXh"
       ],
       "name": "Splash streams",
       "settings": {
         "menu": "main-menu",
         "menu_logo": "shopify://shop_images/duet_web_menu_star.png",
         "logo_width": 450,
-        "overlay_color": "#0b0b0f",
-        "overlay_opacity": 70
+        "overlay_color": "#ff0000",
+        "overlay_opacity": 65
       }
     }
   },
