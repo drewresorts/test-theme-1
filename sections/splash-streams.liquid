@@ -5,8 +5,7 @@
   assign logo_src_width = logo_width | times: 2
   assign overlay_opacity = section.settings.overlay_opacity | default: 35
   assign overlay_color = section.settings.overlay_color | default: '#000000'
-  assign overlay_alpha = overlay_opacity | times: 1.0 | divided_by: 100.0
-  assign overlay_fill = overlay_color | color_modify: 'alpha', overlay_alpha
+  assign overlay_alpha = overlay_opacity | times: 0.01
 
   assign stream_blocks = section.blocks | where: 'type', 'stream'
   assign email_blocks = section.blocks | where: 'type', 'email_signup'
@@ -39,17 +38,17 @@
         autoplay
       ></video>
     </div>
+    <div
+      class="splash-streams__overlay"
+      aria-hidden="true"
+      style="background-color: {{ overlay_color }}; opacity: {{ overlay_alpha }};"
+    ></div>
   </div>
-
-  <div
-    class="splash-streams__overlay"
-    aria-hidden="true"
-    style="background-color: {{ overlay_fill }};"
-  ></div>
 
   {% style %}
     #shopify-section-{{ section.id }} .splash-streams__overlay {
-      background-color: {{ overlay_fill }};
+      background-color: {{ overlay_color }};
+      opacity: {{ overlay_alpha }};
     }
   {% endstyle %}
 
@@ -336,9 +335,9 @@
   .splash-streams__overlay {
     position: absolute;
     inset: 0;
-    z-index: 5;
+    z-index: 10;
     pointer-events: none;
-    transform: translateZ(1px);
+    transform: translateZ(10px);
   }
 
   .splash-streams__chrome {
