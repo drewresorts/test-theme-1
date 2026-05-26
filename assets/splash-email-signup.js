@@ -7,6 +7,24 @@
   if (window.__splashEmailSignupLoaded) return;
   window.__splashEmailSignupLoaded = true;
 
+  function isSplashEmailForm(el) {
+    return el && el.matches && el.matches('form.splash-streams__email-form');
+  }
+
+  function blockDocumentSubmit(ev) {
+    if (!isSplashEmailForm(ev.target)) return;
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+    var root = ev.target.closest('[data-splash-email-root]');
+    if (root) {
+      var btn = root.querySelector('[data-splash-email-submit]');
+      if (btn) btn.click();
+    }
+    return false;
+  }
+
+  document.addEventListener('submit', blockDocumentSubmit, true);
+
   var STRINGS = {
     error: 'Please enter a valid email address.',
     captcha: 'Check the box in the dialog, tap Submit there, then tap Continue below.',
@@ -61,6 +79,8 @@
     document.documentElement.classList.add('splash-streams--challenge-open');
     frame.src = '/challenge#' + encodeURIComponent(formId);
   }
+
+  window.__splashEmailShowChallenge = showChallenge;
 
   function showSuccess(root) {
     var formPanel = $(root, '[data-splash-email-form-panel]');
@@ -234,6 +254,23 @@
         }
       });
     }
+
+    var sink = $(root, '[data-splash-email-post-sink]');
+    if (sink) {
+      sink.addEventListener('load', function () {
+        var path = '';
+        try {
+          path = sink.contentWindow && sink.contentWindow.location ? sink.contentWindow.location.pathname : '';
+        } catch (e) {
+          path = '';
+        }
+        if (path.indexOf('/challenge') !== -1) {
+          showChallenge(root, form);
+          var err = $(root, '[data-splash-email-error]');
+          showError(err, STRINGS.captcha);
+        }
+      });
+    }
   }
 
   function init(scope) {
@@ -242,24 +279,6 @@
 
   function boot() {
     init();
-    document.addEventListener(
-      'submit',
-      function (ev) {
-        var form = ev.target;
-        if (!form || !form.matches || !form.matches('form.splash-streams__email-form[data-splash-email-form]')) {
-          return;
-        }
-        ev.preventDefault();
-        ev.stopImmediatePropagation();
-        var root = form.closest('[data-splash-email-root]');
-        if (root) {
-          var btn = $(root, '[data-splash-email-submit]');
-          if (btn) btn.click();
-        }
-        return false;
-      },
-      true
-    );
   }
 
   if (document.readyState === 'loading') {
