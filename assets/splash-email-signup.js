@@ -1,12 +1,15 @@
 /**
- * Splash homepage email signup — captcha in overlay on splash, no full-page redirect.
+ * Splash homepage email — never navigate to /challenge; captcha in overlay on splash.
  */
 (function () {
   'use strict';
 
+  if (window.__splashEmailSignupLoaded) return;
+  window.__splashEmailSignupLoaded = true;
+
   var STRINGS = {
     error: 'Please enter a valid email address.',
-    captcha: 'Complete verification in the box, then tap Continue.',
+    captcha: 'Check the box in the dialog, tap Submit there, then tap Continue below.',
   };
 
   var stringsEl = document.querySelector('[data-splash-streams-strings]');
@@ -92,10 +95,17 @@
       method: 'POST',
       body: new FormData(form),
       credentials: 'same-origin',
+      redirect: 'manual',
       headers: { 'X-Requested-With': 'XMLHttpRequest' },
     }).then(function (res) {
       return res.text().then(function (html) {
-        return { status: res.status, ok: res.ok, html: html, url: res.url || '' };
+        return {
+          status: res.status,
+          ok: res.ok,
+          type: res.type,
+          html: html,
+          url: res.url || '',
+        };
       });
     });
   }
@@ -103,13 +113,20 @@
   function handleResult(result, root, form, blockId, errorEl, submitBtn) {
     if (submitBtn) submitBtn.disabled = false;
 
-    if (isChallengeHtml(result.html, result.url) || result.status === 400) {
+    var challenge =
+      result.type === 'opaqueredirect' ||
+      result.status === 400 ||
+      result.status === 302 ||
+      result.status === 303 ||
+      isChallengeHtml(result.html, result.url);
+
+    if (challenge) {
       showChallenge(root, form);
       showError(errorEl, STRINGS.captcha);
       return;
     }
 
-    if (isSuccessHtml(result.html, blockId) || (result.ok && !isChallengeHtml(result.html, result.url))) {
+    if (isSuccessHtml(result.html, blockId) || (result.ok && result.status >= 200 && result.status < 300)) {
       showSuccess(root);
       return;
     }
@@ -122,7 +139,7 @@
     showError(errorEl, STRINGS.error);
   }
 
-  function submit(root, form, blockId, errorEl, submitBtn) {
+  function runSubmit(root, form, blockId, errorEl, submitBtn) {
     function run() {
       postForm(form)
         .then(function (result) {
@@ -141,14 +158,39 @@
     }
   }
 
+  function blockNativeSubmit(form) {
+    form.setAttribute('data-splash-email-blocked', 'true');
+    form.addEventListener(
+      'submit',
+      function (ev) {
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+        return false;
+      },
+      true
+    );
+    var nativeSubmit = form.submit;
+    form.submit = function () {
+      var root = form.closest('[data-splash-email-root]');
+      if (root) {
+        var btn = $(root, '[data-splash-email-submit]');
+        if (btn) btn.click();
+      }
+      return false;
+    };
+  }
+
   function bindRoot(root) {
     var form = $(root, 'form.splash-streams__email-form');
     if (!form || form.dataset.splashEmailBound === '1') return;
     form.dataset.splashEmailBound = '1';
 
+    blockNativeSubmit(form);
+
     var blockId = root.getAttribute('data-splash-email-block-id');
     var errorEl = $(root, '[data-splash-email-error]');
-    var submitBtn = form.querySelector('[type="submit"]');
+    var submitBtn = $(root, '[data-splash-email-submit]');
+    var emailInput = form.querySelector('input[type="email"]');
 
     if (window.Shopify && window.Shopify.captcha && typeof window.Shopify.captcha.protect === 'function') {
       window.Shopify.captcha.protect(form, function () {});
@@ -161,7 +203,7 @@
         hideError(errorEl);
         if (submitBtn) {
           submitBtn.disabled = true;
-          submit(root, form, blockId, errorEl, submitBtn);
+          runSubmit(root, form, blockId, errorEl, submitBtn);
         }
       });
     }
@@ -170,27 +212,60 @@
       showSuccess(root);
     }
 
-    form.addEventListener(
-      'submit',
-      function (ev) {
-        ev.preventDefault();
-        ev.stopImmediatePropagation();
-        hideError(errorEl);
+    function onSubscribeClick() {
+      hideError(errorEl);
+      if (!form.checkValidity || form.checkValidity()) {
         if (submitBtn) submitBtn.disabled = true;
-        submit(root, form, blockId, errorEl, submitBtn);
-      },
-      true
-    );
+        runSubmit(root, form, blockId, errorEl, submitBtn);
+      } else if (form.reportValidity) {
+        form.reportValidity();
+      }
+    }
+
+    if (submitBtn) {
+      submitBtn.addEventListener('click', onSubscribeClick);
+    }
+
+    if (emailInput) {
+      emailInput.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter') {
+          ev.preventDefault();
+          onSubscribeClick();
+        }
+      });
+    }
   }
 
   function init(scope) {
     (scope || document).querySelectorAll('[data-splash-email-root]').forEach(bindRoot);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
+  function boot() {
     init();
+    document.addEventListener(
+      'submit',
+      function (ev) {
+        var form = ev.target;
+        if (!form || !form.matches || !form.matches('form.splash-streams__email-form[data-splash-email-form]')) {
+          return;
+        }
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+        var root = form.closest('[data-splash-email-root]');
+        if (root) {
+          var btn = $(root, '[data-splash-email-submit]');
+          if (btn) btn.click();
+        }
+        return false;
+      },
+      true
+    );
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
   }
 
   document.addEventListener('shopify:section:load', function (ev) {
