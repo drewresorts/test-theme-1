@@ -5,6 +5,8 @@
   assign logo_src_width = logo_width | times: 2
   assign overlay_opacity = section.settings.overlay_opacity | default: 35
   assign overlay_color = section.settings.overlay_color | default: '#000000'
+  assign overlay_alpha = overlay_opacity | times: 1.0 | divided_by: 100.0
+  assign overlay_fill = overlay_color | color_modify: 'alpha', overlay_alpha
 
   assign stream_blocks = section.blocks | where: 'type', 'stream'
   assign email_blocks = section.blocks | where: 'type', 'email_signup'
@@ -14,11 +16,7 @@
 <section
   class="splash-streams"
   data-splash-streams
-  style="
-    --overlay-color: {{ overlay_color }};
-    --overlay-opacity: {{ overlay_opacity | divided_by: 100.0 }};
-    --logo-width: {{ logo_width }}px;
-  "
+  style="--logo-width: {{ logo_width }}px;"
 >
   <div class="splash-streams__bg" aria-hidden="true">
     <div class="splash-streams__player-shell">
@@ -43,7 +41,17 @@
     </div>
   </div>
 
-  <div class="splash-streams__overlay" aria-hidden="true"></div>
+  <div
+    class="splash-streams__overlay"
+    aria-hidden="true"
+    style="background-color: {{ overlay_fill }};"
+  ></div>
+
+  {% style %}
+    #shopify-section-{{ section.id }} .splash-streams__overlay {
+      background-color: {{ overlay_fill }};
+    }
+  {% endstyle %}
 
   <button
     type="button"
@@ -328,14 +336,9 @@
   .splash-streams__overlay {
     position: absolute;
     inset: 0;
-    z-index: 1;
+    z-index: 5;
     pointer-events: none;
-    background: color-mix(
-      in srgb,
-      var(--overlay-color, #000) calc(var(--overlay-opacity, 0.35) * 100%),
-      transparent
-    );
-    transform: translateZ(0);
+    transform: translateZ(1px);
   }
 
   .splash-streams__chrome {
