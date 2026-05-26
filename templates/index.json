@@ -32,6 +32,7 @@
         },
         "email_signup_8b3nXh": {
           "type": "email_signup",
+          "disabled": true,
           "settings": {
             "position": "bottom",
             "heading": "",
@@ -55,7 +56,7 @@
         "menu_logo": "shopify://shop_images/duet_web_menu_star.png",
         "logo_width": 450,
         "overlay_color": "#ff0000",
-        "overlay_opacity": 65
+        "overlay_opacity": 75
       }
     }
   },
