@@ -41,8 +41,9 @@
         autoplay
       ></video>
     </div>
-    <div class="splash-streams__overlay"></div>
   </div>
+
+  <div class="splash-streams__overlay" aria-hidden="true"></div>
 
   <button
     type="button"
@@ -223,6 +224,7 @@
     position: absolute;
     inset: 0;
     z-index: 0;
+    isolation: isolate;
   }
 
   /* YouTube cannot hide title/channel UI via params; crop it outside the viewport. */
@@ -327,9 +329,13 @@
     position: absolute;
     inset: 0;
     z-index: 1;
-    background: var(--overlay-color);
-    opacity: var(--overlay-opacity);
-    pointer-events: auto;
+    pointer-events: none;
+    background: color-mix(
+      in srgb,
+      var(--overlay-color, #000) calc(var(--overlay-opacity, 0.35) * 100%),
+      transparent
+    );
+    transform: translateZ(0);
   }
 
   .splash-streams__chrome {
