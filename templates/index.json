@@ -55,7 +55,7 @@
         "menu_logo": "shopify://shop_images/duet_web_menu_star.png",
         "logo_width": 450,
         "overlay_color": "#0000ff",
-        "overlay_opacity": 80
+        "overlay_opacity": 20
       }
     }
   },
