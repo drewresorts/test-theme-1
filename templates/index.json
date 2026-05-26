@@ -12,18 +12,6 @@
     "splash_streams_jYPmmR": {
       "type": "splash-streams",
       "blocks": {
-        "email_signup_8b3nXh": {
-          "type": "email_signup",
-          "settings": {
-            "position": "bottom",
-            "heading": "",
-            "text": "",
-            "placeholder": "Email",
-            "button_label": "Subscribe",
-            "success_message": "Thanks — you're on the list.",
-            "lowercase_text": true
-          }
-        },
         "stream_TmMwAG": {
           "type": "stream",
           "settings": {
@@ -41,13 +29,25 @@
           "settings": {
             "youtube_url": "https://www.youtube.com/watch?v=erBoOFKTH4E"
           }
+        },
+        "email_signup_8b3nXh": {
+          "type": "email_signup",
+          "settings": {
+            "position": "bottom",
+            "heading": "",
+            "text": "",
+            "placeholder": "Email",
+            "button_label": "Subscribe",
+            "success_message": "Thanks — you're on the list.",
+            "lowercase_text": true
+          }
         }
       },
       "block_order": [
-        "email_signup_8b3nXh",
         "stream_TmMwAG",
         "stream_jqHxD6",
-        "stream_cqRFbW"
+        "stream_cqRFbW",
+        "email_signup_8b3nXh"
       ],
       "name": "Splash streams",
       "settings": {
