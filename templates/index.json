@@ -84,7 +84,7 @@
       "type": "three-boutique",
       "name": "t:boutique.section.presets.default",
       "settings": {
-        "featured_collection": "automated-collection",
+        "featured_collection": "3d",
         "max_products": 12,
         "eyebrow": "Step inside",
         "heading": "Welcome to the Boutique",
