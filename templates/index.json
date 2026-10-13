@@ -42,10 +42,10 @@
         "stream_jqHxD6",
         "stream_cqRFbW"
       ],
+      "disabled": true,
       "name": "Splash streams",
       "settings": {
         "menu": "main-menu",
-        "menu_logo": "shopify://shop_images/duet_web_menu_star.png",
         "logo_width": 400,
         "overlay_color": "#0b0b0f",
         "overlay_opacity": 50
@@ -79,10 +79,31 @@
         "padding_top": 36,
         "padding_bottom": 36
       }
+    },
+    "three_boutique_NTGFxc": {
+      "type": "three-boutique",
+      "name": "t:boutique.section.presets.default",
+      "settings": {
+        "featured_collection": "automated-collection",
+        "max_products": 12,
+        "eyebrow": "Step inside",
+        "heading": "Welcome to the Boutique",
+        "subheading": "Walk through the gallery, inspect every piece in 3D, choose your variants, and check out without leaving the room.",
+        "cta_label": "Enter the boutique",
+        "floor_color": "#1a1a22",
+        "wall_color": "#0e0e14",
+        "ceiling_color": "#0b0b0f",
+        "accent_color": "#f5f5f5",
+        "room_radius": 9,
+        "pedestal_height": 100,
+        "quality": "auto",
+        "enable_shadows": true
+      }
     }
   },
   "order": [
     "splash_streams_jYPmmR",
-    "featured_collection_home"
+    "featured_collection_home",
+    "three_boutique_NTGFxc"
   ]
 }
